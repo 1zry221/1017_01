@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows 桌面 - 闖關機 1</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Microsoft JhengHei", "Segoe UI", sans-serif; user-select: none; }
+        body { width: 100vw; height: 100vh; background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920') center/cover no-repeat; overflow: hidden; position: relative; }
+
+        /* 桌面圖示網格 */
+        .desktop-grid { display: grid; grid-template-rows: repeat(5, 95px); grid-auto-flow: column; gap: 15px; padding: 20px; width: fit-content; }
+        .icon-item { width: 90px; height: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-shadow: 1px 1px 4px rgba(0,0,0,0.9); cursor: pointer; position: relative; border-radius: 6px; padding: 5px; }
+        .icon-item:hover { background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); }
+        .icon-item img { width: 44px; height: 44px; margin-bottom: 4px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        .icon-title { font-size: 12px; text-align: center; word-break: break-all; line-height: 1.2; }
+        
+        /* 左下角小數字角標 (剩餘可用/答對次數，初始為 4) */
+        .badge-count { position: absolute; bottom: 22px; left: 8px; background: rgba(0, 0, 0, 0.85); color: #00ffcc; font-weight: bold; font-size: 11px; padding: 1px 6px; border-radius: 10px; border: 1px solid #00ffcc; box-shadow: 0 0 5px rgba(0,255,204,0.5); }
+        
+        /* 答對滿 4 次禁用 */
+        .icon-item.disabled { opacity: 0.35; filter: grayscale(100%); cursor: not-allowed; pointer-events: none; }
+        /* 本機未解鎖 */
+        .icon-item.locked { filter: brightness(0.4) grayscale(80%); }
+
+        /* 工作列與系統時間 */
+        .taskbar { position: absolute; bottom: 0; left: 0; right: 0; height: 40px; background: rgba(20, 20, 20, 0.85); backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; padding: 0 15px; color: white; border-top: 1px solid rgba(255,255,255,0.1); z-index: 100; }
+        .system-tray { font-size: 12px; cursor: pointer; padding: 5px 10px; border-radius: 4px; }
+        .system-tray:hover { background: rgba(255,255,255,0.1); }
+
+        /* Modal 彈出視窗 */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .window-box { width: 420px; background: #f0f0f0; border-radius: 8px; border: 1px solid #777; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden; }
+        .window-header { background: #0078d7; color: white; padding: 8px 12px; font-weight: bold; display: flex; justify-content: space-between; font-size: 14px; }
+        .window-body { padding: 20px; text-align: center; color: #333; }
+        .window-body input { width: 80%; padding: 8px; margin: 15px 0; font-size: 16px; text-align: center; border: 1px solid #ccc; border-radius: 4px; }
+        .window-body button { padding: 8px 22px; background: #0078d7; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .window-body button:hover { background: #005a9e; }
+
+        /* 全白鎖死畫面 */
+        #white-screen-lock { display: none; position: fixed; inset: 0; background: #ffffff; z-index: 999999; }
+
+        /* 管理員後台 Modal */
+        .admin-box { width: 480px; background: #2d2d2d; color: white; border-radius: 8px; padding: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.8); }
+        .admin-box h3 { color: #00d2ff; border-bottom: 1px solid #555; padding-bottom: 10px; margin-bottom: 15px; }
+        .admin-btn { padding: 8px 15px; margin: 5px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-green { background: #28a745; color: white; }
+        .btn-red { background: #dc3545; color: white; }
+        .btn-warning { background: #ff9800; color: white; }
+    </style>
+</head>
+<body>
+
+    <!-- 桌面圖示網格 (共 9 個圖示：1 個本機 + 8 個問題圖示) -->
+    <div class="desktop-grid">
+        <!-- 1. 本機 (核心圖示) -->
+        <div class="icon-item locked" id="icon-this-pc" onclick="clickThisPC()">
+            <img src="https://img.icons8.com/color/96/000000/monitor.png" alt="本機">
+            <div class="icon-title">本機</div>
+        </div>
+
+        <!-- 2. 問題圖示 1 -->
+        <div class="icon-item" id="icon-p1" onclick="openPuzzle('p1', '問題 1：請輸入系統啟動密碼', '1234')">
+            <img src="https://img.icons8.com/color/96/000000/folder-invoices.png" alt="圖示">
+            <div class="badge-count" id="badge-p1">4</div>
+            <div class="icon-title">機密資料夾</div>
+        </div>
+
+        <!-- 3. 問題圖示 2 -->
+        <div class="icon-item" id="icon-p2" onclick="openPuzzle('p2', '問題 2：台灣最高的山峰名稱？', '玉山')">
+            <img src="https://img.icons8.com/color/96/000000/txt.png" alt="圖示">
+            <div class="badge-count" id="badge-p2">4</div>
+            <div class="icon-title">提示筆記.txt</div>
+        </div>
+
+        <!-- 4. 問題圖示 3 -->
+        <div class="icon-item" id="icon-p3" onclick="openPuzzle('p3', '問題 3：1 + 1 等於幾？', '2')">
+            <img src="https://img.icons8.com/color/96/000000/word.png" alt="圖示">
+            <div class="badge-count" id="badge-p3">4</div>
+            <div class="icon-title">實驗報告.docx</div>
+        </div>
+
+        <!-- 5. 問題圖示 4 -->
+        <div class="icon-item" id="icon-p4" onclick="openPuzzle('p4', '問題 4：摩斯密碼 ··· --- ··· 代表？', 'SOS')">
+            <img src="https://img.icons8.com/color/96/000000/chrome.png" alt="圖示">
+            <div class="badge-count" id="badge-p4">4</div>
+            <div class="icon-title">Google Chrome</div>
+        </div>
+
+        <!-- 6. 問題圖示 5 -->
+        <div class="icon-item" id="icon-p5" onclick="openPuzzle('p5', '問題 5：十六進位 FF 的十進位數值？', '255')">
+            <img src="https://img.icons8.com/color/96/000000/code.png" alt="圖示">
+            <div class="badge-count" id="badge-p5">4</div>
+            <div class="icon-title">CodeBlocks</div>
+        </div>
+
+        <!-- 7. 問題圖示 6 -->
+        <div class="icon-item" id="icon-p6" onclick="openPuzzle('p6', '問題 6：請輸入英文單字：APPLE', 'APPLE')">
+            <img src="https://img.icons8.com/color/96/000000/calculator.png" alt="圖示">
+            <div class="badge-count" id="badge-p6">4</div>
+            <div class="icon-title">計算機.exe</div>
+        </div>
+
+        <!-- 8. 問題圖示 7 -->
+        <div class="icon-item" id="icon-p7" onclick="openPuzzle('p7', '問題 7：一年有幾個月？', '12')">
+            <img src="https://img.icons8.com/color/96/000000/pdf.png" alt="圖示">
+            <div class="badge-count" id="badge-p7">4</div>
+            <div class="icon-title">機密手冊.pdf</div>
+        </div>
+
+        <!-- 9. 問題圖示 8 -->
+        <div class="icon-item" id="icon-p8" onclick="openPuzzle('p8', '問題 8：請輸入終極解密碼：888', '888')">
+            <img src="https://img.icons8.com/color/96/000000/vlc.png" alt="圖示">
+            <div class="badge-count" id="badge-p8">4</div>
+            <div class="icon-title">媒體播放器</div>
+        </div>
+    </div>
+
+    <!-- 工作列 -->
+    <div class="taskbar">
+        <span>🪟 開始</span>
+        <div class="system-tray" id="tray-clock" onclick="clickClockCount()">10:30 上午 (連點3下開啟後台)</div>
+    </div>
+
+    <!-- 普通解謎 Modal -->
+    <div class="modal-overlay" id="puzzle-modal">
+        <div class="window-box">
+            <div class="window-header">
+                <span id="modal-title">題目解密</span>
+                <span style="cursor:pointer;" onclick="closeModal('puzzle-modal')">✕</span>
+            </div>
+            <div class="window-body">
+                <p id="modal-q" style="font-weight:bold;">題目載入中...</p>
+                <input type="text" id="modal-ans" placeholder="請輸入答案" autocomplete="off">
+                <br>
+                <button onclick="submitAnswer()">確認送出</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 本機通關成功 Modal (含 QR Code 與 2 分鐘倒數) -->
+    <div class="modal-overlay" id="this-pc-modal">
+        <div class="window-box">
+            <div class="window-header"><span>本機 - 核心檔案解鎖</span></div>
+            <div class="window-body">
+                <h3 style="color:#28a745; margin-bottom: 10px;">🎉 核心驗證成功！</h3>
+                <p id="pc-result-text" style="font-size: 14px; margin-bottom: 15px;">恭喜取得核心線索，請使用手機掃描下方二維碼進入下一關卡：</p>
+                <img id="qr-img" src="" style="width: 160px; height: 160px; border: 1px solid #ccc; padding: 5px;">
+                <p style="color:red; margin-top:15px; font-weight:bold; font-size: 13px;">
+                    ⚠️ 電腦系統將於 <span id="timer-count">120</span> 秒後自我鎖定！
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 全白鎖死畫面 -->
+    <div id="white-screen-lock"></div>
+
+    <!-- 隱藏管理員控制面板 Modal (按 Ctrl+Shift+A 或連擊時間開啟) -->
+    <div class="modal-overlay" id="admin-modal">
+        <div class="admin-box">
+            <h3>⚙️ 隱藏管理員控制台 (單機版)</h3>
+            <div style="margin-bottom: 15px;">
+                <p><strong>「本機」狀態控制：</strong></p>
+                <button class="admin-btn btn-green" onclick="adminToggleForcePC(true)">強制解鎖本機</button>
+                <button class="admin-btn btn-red" onclick="adminToggleForcePC(false)">恢復預設規則 (需答對2次)</button>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <p><strong>系統鎖定控制：</strong></p>
+                <button class="admin-btn btn-warning" onclick="adminResetWhiteLock()">解除全白鎖定畫面</button>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <p><strong>重置數據：</strong></p>
+                <button class="admin-btn btn-red" onclick="adminResetData()">⚠️ 清空本機所有答題紀錄</button>
+            </div>
+            <hr style="border-color:#555; margin:15px 0;">
+            <button class="admin-btn" style="background:#6c757d; color:white;" onclick="closeModal('admin-modal')">關閉後台</button>
+        </div>
+    </div>
+
+    <script>
+        // 本網頁的題目 ID 清單
+        const PUZZLE_IDS = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8'];
+        const MAX_CORRECT = 4; // 每題最多可答對次數
+        const STORAGE_KEY = 'desktop1_game_data'; // 每個桌面檔名可使用獨立的 Key
+        
+        let currentPId = null;
+        let currentCorrectAns = null;
+        let clockClickCount = 0;
+
+        // 初始化資料結構
+        function getLocalData() {
+            let data = localStorage.getItem(STORAGE_KEY);
+            return data ? JSON.parse(data) : { counts: {}, forceUnlock: false, isLocked: false };
+        }
+
+        function saveLocalData(data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            updateUI();
+        }
+
+        // 重新繪製 UI
+        function updateUI() {
+            let data = getLocalData();
+
+            // 1. 檢測全白鎖定
+            if (data.isLocked) {
+                document.getElementById('white-screen-lock').style.display = 'block';
+                return;
+            } else {
+                document.getElementById('white-screen-lock').style.display = 'none';
+            }
+
+            // 2. 更新一般圖示剩餘次數 (上限4次)
+            let allAnsweredTwoTimes = true;
+            PUZZLE_IDS.forEach(id => {
+                let count = data.counts[id] || 0;
+                let remaining = Math.max(0, MAX_CORRECT - count);
+
+                let badge = document.getElementById(`badge-${id}`);
+                let icon = document.getElementById(`icon-${id}`);
+
+                if (badge) badge.innerText = remaining;
+
+                // 答對滿 4 次禁用
+                if (count >= MAX_CORRECT && icon) {
+                    icon.classList.add('disabled');
+                } else if (icon) {
+                    icon.classList.remove('disabled');
+                }
+
+                // 檢查該圖示是否已答對 >= 2 次
+                if (count < 2) allAnsweredTwoTimes = false;
+            });
+
+            // 3. 檢查「本機」圖示是否解鎖 (所有圖示 >= 2次 或 中控台強制解鎖)
+            let pcIcon = document.getElementById('icon-this-pc');
+            if (allAnsweredTwoTimes || data.forceUnlock) {
+                pcIcon.classList.remove('locked');
+            } else {
+                pcIcon.classList.add('locked');
+            }
+        }
+
+        // 開啟普通題目
+        function openPuzzle(id, question, answer) {
+            let data = getLocalData();
+            if ((data.counts[id] || 0) >= MAX_CORRECT) {
+                alert("該圖示已達最大答對/檢閱次數 (4次)，已停用！");
+                return;
+            }
+            currentPId = id;
+            currentCorrectAns = answer;
+            document.getElementById('modal-q').innerText = question;
+            document.getElementById('modal-ans').value = '';
+            document.getElementById('puzzle-modal').style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // 送出答案
+        function submitAnswer() {
+            let input = document.getElementById('modal-ans').value.trim();
+            if (input === currentCorrectAns) {
+                alert("🎉 答案正確！");
+                let data = getLocalData();
+                data.counts[currentPId] = (data.counts[currentPId] || 0) + 1;
+                saveLocalData(data);
+                closeModal('puzzle-modal');
+            } else {
+                alert("❌ 答案錯誤，請再試一次！");
+            }
+        }
+
+        // 點擊「本機」圖示
+        function clickThisPC() {
+            let pcIcon = document.getElementById('icon-this-pc');
+            if (pcIcon.classList.contains('locked')) {
+                alert("【系統提示】本機目前無法顯示！\n需要所有其他圖示都被答對過 2 次，或由工作人員從後台開啟。");
+                return;
+            }
+
+            // 開啟本機題目
+            currentPId = 'this_pc_puzzle';
+            currentCorrectAns = 'core999'; // 本機答案
+            document.getElementById('modal-q').innerText = "【本機核心驗證】請輸入主機核心金鑰：";
+            document.getElementById('modal-ans').value = '';
+            document.getElementById('puzzle-modal').style.display = 'flex';
+
+            // 修改本機專屬送出邏輯
+            document.querySelector('#puzzle-modal button').onclick = function() {
+                if (document.getElementById('modal-ans').value.trim() === currentCorrectAns) {
+                    closeModal('puzzle-modal');
+                    triggerThisPCSuccess("https://example.com/stage-target"); // QR Code 目標網址
+                } else {
+                    alert("❌ 金鑰不正確！");
+                }
+            };
+        }
+
+        // 本機答對後：彈出 QR Code + 文字 + 啟動 2 分鐘倒數
+        function triggerThisPCSuccess(targetUrl) {
+            document.getElementById('qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(targetUrl)}`;
+            document.getElementById('this-pc-modal').style.display = 'flex';
+
+            let t = 120; // 120 秒 (2 分鐘)
+            let timer = setInterval(() => {
+                t--;
+                document.getElementById('timer-count').innerText = t;
+                if (t <= 0) {
+                    clearInterval(timer);
+                    let data = getLocalData();
+                    data.isLocked = true; // 設置全白鎖定狀態
+                    saveLocalData(data);
+                }
+            }, 1000);
+        }
+
+        // 隱藏管理員控制台邏輯
+        function openAdminModal() {
+            let pin = prompt("請輸入管理員密碼：");
+            if (pin === "8888") { // 預設管理員密碼
+                document.getElementById('admin-modal').style.display = 'flex';
+            } else if (pin !== null) {
+                alert("密碼錯誤！");
+            }
+        }
+
+        function adminToggleForcePC(status) {
+            let data = getLocalData();
+            data.forceUnlock = status;
+            saveLocalData(data);
+            alert(status ? "已強制開放本機！" : "已恢復預設規則。");
+        }
+
+        function adminResetWhiteLock() {
+            let data = getLocalData();
+            data.isLocked = false;
+            saveLocalData(data);
+            alert("已解除全白鎖死畫面！");
+        }
+
+        function adminResetData() {
+            if (confirm("確定要重置本台電腦的所有答題紀錄與狀態？")) {
+                localStorage.removeItem(STORAGE_KEY);
+                updateUI();
+                alert("本機數據已成功重置！");
+            }
+        }
+
+        // 觸發管理員面板方式 1：鍵盤快捷鍵 Ctrl + Shift + A
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.shiftKey && e.key.toUpperCase() === 'A') {
+                openAdminModal();
+            }
+        });
+
+        // 觸發管理員面板方式 2：連續點擊右下角時間 3 下
+        function clickClockCount() {
+            clockClickCount++;
+            if (clockClickCount >= 3) {
+                clockClickCount = 0;
+                openAdminModal();
+            }
+            setTimeout(() => { clockClickCount = 0; }, 2000);
+        }
+
+        window.onload = updateUI;
+    </script>
+</body>
+</html>
