@@ -453,6 +453,16 @@
         }
 
         window.onload = updateUI;
+        if (window.location.search.includes('reset=true')) {
+            localStorage.removeItem(STORAGE_KEY);
+            alert('已成功重置本頁所有紀錄！');
+            window.location.href = window.location.pathname;
+        }
+
+        window.onload = updateUI;
+    </script>
+</body>
+</html>
     </script>
 </body>
 </html>
