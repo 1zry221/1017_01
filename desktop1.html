@@ -325,6 +325,70 @@
             word-break: break-all;
             margin: 0;
         }
+        /* ================= 擬真 刀械領用清冊 (紅光警報 + 打字動畫) ================= */
+        .weapons-window {
+            width: 85%;
+            max-width: 780px;
+            height: 75vh;
+            background: #0d0000;
+            border: 1px solid #ff3333;
+            border-radius: 6px;
+            box-shadow: 0 0 25px rgba(255, 51, 51, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-family: 'Consolas', 'Courier New', monospace;
+        }
+
+        .weapons-toolbar {
+            background: #2b0000;
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ff3333;
+            color: #ff8888;
+            font-size: 13px;
+        }
+
+        .close-weapons { cursor: pointer; color: #ff5555; font-weight: bold; }
+        .close-weapons:hover { color: #ff8888; }
+
+        .weapons-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #080000;
+            color: #ff5555; /* 警示紅色字體 */
+            font-size: 13.5px;
+            line-height: 1.55;
+            text-shadow: 0 0 3px rgba(255, 85, 85, 0.5);
+            text-align: left;
+        }
+
+        .weapons-text {
+            font-family: 'Consolas', 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            margin: 0;
+            display: inline;
+        }
+
+        /* 閃爍游標效果 */
+        .typing-cursor {
+            display: inline-block;
+            width: 8px;
+            height: 15px;
+            background: #ff5555;
+            margin-left: 2px;
+            animation: blink 0.8s infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
     </style>
 </head>
 <body>
@@ -356,6 +420,12 @@
             <img src="https://img.icons8.com/color/96/analytics.png" alt="財務審計紀錄">
             <div class="badge-count" id="badge-p_finance">4</div>
             <div class="icon-title">財務審計紀錄.log</div>
+        </div>
+        <!-- 管制工具與刀械領用清冊圖示 (新增) -->
+        <div class="icon-item" id="icon-p_weapons" onclick="openPuzzle('p_weapons', '計算深空輻射衰減係數之總和 S = ∑<sub>k=2</sub><sup>100</sup> log<sub>10</sub>(1 - 1/k<sup>2</sup>)。<br>若 S = log<sub>10</sub>(a/b)（a, b 為互質之正整數），<br>請輸入密碼：<b>a + b</b> 之值。', '301')">
+            <img src="https://img.icons8.com/color/96/knife.png" alt="管制工具與刀械領用清冊">
+            <div class="badge-count" id="badge-p_weapons">4</div>
+            <div class="icon-title">管制工具與刀械領用清冊.log</div>
         </div>
     </div>
 
@@ -511,6 +581,18 @@
             </div>
         </div>
     </div>
+    <!-- 擬真 刀械領用清冊 Modal (打字動畫版) -->
+    <div class="modal-overlay" id="weapons-viewer-modal">
+        <div class="weapons-window">
+            <div class="weapons-toolbar">
+                <span>🚨 SECURITY_LOG - WEAPON_REGISTRY_SYS</span>
+                <span class="close-weapons" onclick="closeModal('weapons-viewer-modal')">✕ 關閉</span>
+            </div>
+            <div class="weapons-body">
+                <pre class="weapons-text" id="weapons-typewriter-text"></pre><span class="typing-cursor"></span>
+            </div>
+        </div>
+    </div>
     <!-- 本機成功 Modal -->
     <div class="modal-overlay" id="this-pc-modal">
         <div class="window-box">
@@ -577,7 +659,7 @@
     </div>
 
     <script>
-        const PUZZLE_IDS = ['p_diary', 'p_album', 'p_proposal', 'p_finance'];
+        const PUZZLE_IDS = ['p_diary', 'p_album', 'p_proposal', 'p_finance', 'p_weapons'];
         const MAX_CORRECT = 4;
         const STORAGE_KEY = 'desktop1_game_data';
         
@@ -660,13 +742,32 @@
             }
             currentPId = id;
             currentCorrectAns = answer;
-            document.getElementById('modal-q').innerText = question;
+            document.getElementById('modal-q').innerHTML = question;
             document.getElementById('modal-ans').value = '';
             document.getElementById('puzzle-modal').style.display = 'flex';
         }
 
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
+        }
+
+        // 全域打字機定時器
+        let typingTimer = null;
+
+        // 打字動畫效果
+        function startTypewriter(elementId, text, speed = 20) {
+            const el = document.getElementById(elementId);
+            el.innerText = '';
+            if (typingTimer) clearInterval(typingTimer);
+            let index = 0;
+            typingTimer = setInterval(() => {
+                if (index < text.length) {
+                    el.innerText += text.charAt(index);
+                    index++;
+                } else {
+                    clearInterval(typingTimer);
+                }
+            }, speed);
         }
 
         // 送出答案邏輯
@@ -692,6 +793,11 @@
                     document.getElementById('pdf-viewer-modal').style.display = 'flex';
                 } else if (currentPId === 'p_finance') {
                     document.getElementById('audit-viewer-modal').style.display = 'flex';
+                } else if (currentPId === 'p_weapons') {
+                    document.getElementById('weapons-viewer-modal').style.display = 'flex';
+                    // 觸發打字動畫
+                    const textContent = `--------------------------------------------------\n[驗證成功 —— 檔案已解封]\n\n■ 異常申領紀錄存根：\n- 物品名稱：高硬度合金維修匕首 (編號：WPN-27-B)\n- 申領人員：27 號 (跨域支援技師)\n- 申領時間：案發前夕 22:15\n- 歸還狀態：【未歸還】(警告：該刃具目前仍由 27 號私自持有中)\n\n■ 系統警示：\n  \`[SECURITY_ALERT]\` 27 號並非安保人員，無權在非維修時段持有銳利刃具。\n  \`[LOCATION]\` 門禁追蹤顯示，27 號曾攜帶該刃具於導航艙外走廊停留 18 分鐘。\n==================================================`;
+                    startTypewriter('weapons-typewriter-text', textContent, 18);
                 } else {
                     // 其他普通題目答對時顯示提示
                     alert("🎉 答案正確！");
