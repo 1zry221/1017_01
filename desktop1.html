@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Windows 桌面 - 闖關機 1</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Liu+Jian+Mao+Cao&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", "Microsoft JhengHei", sans-serif; user-select: none; }
         body { width: 100vw; height: 100vh; background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920') center/cover no-repeat; overflow: hidden; position: relative; }
 
@@ -231,28 +232,31 @@
             filter: sepia(0.2) contrast(1.1) brightness(0.9);
         }
         /* 底部手寫字體留言 */
-        .photo-caption {
-            margin-top: 15px;
-            text-align: center;
-            color: #111;
-        }
-
-        .handwriting-text {
-            font-family: "DFKai-SB", "Kaiti", "Georgia", serif;
-            font-size: 17px;
-            font-weight: bold;
+       .handwriting-text {
+            font-family: 'Liu Jian Mao Cao', cursive; 
+            font-size: 24px; /* 手寫字體需要調大一點才清楚 */
+            font-weight: normal; 
             color: #b71c1c;
             margin-bottom: 8px;
             line-height: 1.4;
             text-shadow: 0 0 1px rgba(183, 28, 28, 0.4);
         }
-
         .creepy-subtext {
             font-size: 12px;
             color: #666;
             border-top: 1px stroke #e0e0e0;
             padding-top: 6px;
             font-style: italic;
+        }
+        /* 新增：右下角「帆」的署名設計 */
+        .signature {
+            position: absolute;
+            bottom: 0px;
+            right: 15px;
+            font-family: 'Liu Jian Mao Cao', cursive;
+            font-size: 22px;
+            color: #8b0000;
+            transform: rotate(-8deg); /* 稍微傾斜更自然 */
         }
     </style>
 </head>
@@ -352,6 +356,7 @@
                     <div class="photo-caption">
                         <p class="handwriting-text">「既然得不到妳，那就大家一起死！」</p>
                         <p class="creepy-subtext">【相片背面血跡留言】：2026.10.17 終結一切。</p>
+                        <span class="signature">帆</span>
                     </div>
                 </div>
             </div>
