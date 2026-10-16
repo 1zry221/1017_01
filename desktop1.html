@@ -389,6 +389,53 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0; }
         }
+        /* ================= 擬真 門禁與生理監測 (霓虹藍光) ================= */
+        .telemetry-window {
+            width: 85%;
+            max-width: 780px;
+            height: 75vh;
+            background: #000c18;
+            border: 1px solid #00f0ff;
+            border-radius: 6px;
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.25);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-family: 'Consolas', 'Courier New', monospace;
+        }
+
+        .telemetry-toolbar {
+            background: #001f3f;
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #00f0ff;
+            color: #7fdbff;
+            font-size: 13px;
+        }
+
+        .close-telemetry { cursor: pointer; color: #ff5555; font-weight: bold; }
+        .close-telemetry:hover { color: #ff8888; }
+
+        .telemetry-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #000810;
+            color: #00f0ff; /* 霓虹科技藍 */
+            font-size: 13.5px;
+            line-height: 1.55;
+            text-shadow: 0 0 3px rgba(0, 240, 255, 0.5);
+            text-align: left;
+        }
+
+        .telemetry-text {
+            font-family: 'Consolas', 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -426,6 +473,12 @@
             <img src="https://img.icons8.com/color/96/knife.png" alt="管制工具與刀械領用清冊">
             <div class="badge-count" id="badge-p_weapons">4</div>
             <div class="icon-title">管制工具與刀械領用清冊.log</div>
+        </div>
+        <!-- 門禁與生理監測圖示 (新增) -->
+        <div class="icon-item" id="icon-p_access" onclick="openPuzzle('p_access', '【門禁與生理監測日誌】請輸入任意一組有效通行證編號：', VALID_ACCESS_CODES)">
+            <img src="https://img.icons8.com/color/96/fingerprint.png" alt="門禁與生理監測">
+            <div class="badge-count" id="badge-p_access">4</div>
+            <div class="icon-title">門禁與生理監測.log</div>
         </div>
     </div>
 
@@ -633,6 +686,33 @@
             </div>
         </div>
     </div>
+    <!-- 擬真 門禁與生理監測 Modal -->
+    <div class="modal-overlay" id="telemetry-viewer-modal">
+        <div class="telemetry-window">
+            <div class="telemetry-toolbar">
+                <span>📡 POLARIS_SYSTEM_LOG - ACCESS_&_VITAL_TELEMETRY</span>
+                <span class="close-telemetry" onclick="closeModal('telemetry-viewer-modal')">✕ 關閉</span>
+            </div>
+            <div class="telemetry-body">
+                <pre class="telemetry-text">==================================================
+[POLARIS_SYSTEM_LOG] ACCESS_&_VITAL_TELEMETRY
+--------------------------------------------------
+>> SUBJECT     : 9018
+>> TERMINAL    : MAIN_HALL / CENTRAL_CONSOLE
+
+--------------------------------------------------
+[EVENT_TIMELINE]
+[23:30:12] GATEWAY_ACCESS : KEY_01 swiped at Main Hall entrance.
+[23:48:05] SYSTEM_OVERRIDE: Central console activated via KEY_01.
+[23:52:19] KEY_STATUS     : KEY_01 locked in main terminal slot.
+[23:56:40] TELEMETRY_WARN : Vital telemetry signal fluctuating.
+[00:00:15] SIGNAL_LOST     : Pulse telemetry severed (0 bpm).
+
+--------------------------------------------------
+==================================================</pre>
+            </div>
+        </div>
+    </div>
     <!-- 全白鎖死畫面 -->
     <div id="white-screen-lock"></div>
 
@@ -659,7 +739,16 @@
     </div>
 
     <script>
-        const PUZZLE_IDS = ['p_diary', 'p_album', 'p_proposal', 'p_finance', 'p_weapons'];
+        // 29 組可通行的密碼清單
+        const VALID_ACCESS_CODES = [
+            'ZK341664', 'KO670360', 'VW239047', 'RG743954', 'AX029069', 
+            'EH567203', 'FT893055', 'SD449847', 'JM347341', 'SP348363', 
+            'BC675309', 'WV499863', 'XG981292', 'LH750729', 'VY238190', 
+            'PJ429636', 'XN893906', 'NV519958', 'XB775589', 'ND138392', 
+            'LC694650', 'RT742822', 'TS451120', 'HK621906', 'UC899609', 
+            'MW735695', 'SH014740', 'OH435324', 'HR164810'
+        ];
+        const PUZZLE_IDS = ['p_diary', 'p_album', 'p_proposal', 'p_finance', 'p_weapons', 'p_access'];
         const MAX_CORRECT = 4;
         const STORAGE_KEY = 'desktop1_game_data';
         
@@ -774,16 +863,24 @@
         function submitAnswer() {
             let input = document.getElementById('modal-ans').value.trim();
             
-            if (input === currentCorrectAns) {
+            // 判斷答案是否正確（支援多組密碼陣列或單一密碼）
+            let isCorrect = false;
+            if (Array.isArray(currentCorrectAns)) {
+                isCorrect = currentCorrectAns.includes(input);
+            } else {
+                isCorrect = (input === String(currentCorrectAns).toUpperCase());
+            }
+
+            if (isCorrect) {
                 // 1. 紀錄答對次數 +1 並儲存
                 let data = getLocalData();
                 data.counts[currentPId] = (data.counts[currentPId] || 0) + 1;
                 saveLocalData(data);
-        
+
                 // 2. 關閉輸入密碼視窗
                 closeModal('puzzle-modal');
-        
-                // 3. 判斷：如果是「資源抽調日記」，答對後直接彈出 PDF 視窗！
+
+                // 3. 判斷答對項目，彈出對應 Modal
                 if (currentPId === 'p_diary') {
                     document.getElementById('cmd-viewer-modal').style.display = 'flex';
                 } else if (currentPId === 'p_album') {
@@ -798,6 +895,8 @@
                     // 觸發打字動畫
                     const textContent = `--------------------------------------------------\n[驗證成功 —— 檔案已解封]\n\n■ 異常申領紀錄存根：\n- 物品名稱：高硬度合金維修匕首 (編號：WPN-27-B)\n- 申領人員：3046\n- 申領時間：10/13 22:15\n- 歸還狀態：【未歸還】(警告：該刃具目前仍由3046私自持有中)\n\n■ 系統警示：\n  \`[SECURITY_ALERT]\` 3046並非安保人員，無權在非維修時段持有銳利刃具。\n  \`[LOCATION]\` 門禁追蹤顯示，3046曾攜帶該刃具於導航艙外走廊停留 18 分鐘。\n==================================================`;
                     startTypewriter('weapons-typewriter-text', textContent, 18);
+                } else if (currentPId === 'p_access') {
+                    document.getElementById('telemetry-viewer-modal').style.display = 'flex';
                 } else {
                     // 其他普通題目答對時顯示提示
                     alert("🎉 答案正確！");
