@@ -104,6 +104,73 @@
         .btn-green { background: #28a745; color: white; }
         .btn-red { background: #dc3545; color: white; }
         .btn-warning { background: #ff9800; color: white; }
+        /* 擬真 PDF 視窗樣式 */
+        .pdf-window {
+            width: 80%;
+            max-width: 800px;
+            height: 85vh;
+            background: #323639;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            color: white;
+        }
+
+        .pdf-toolbar {
+            background: #2a2e31;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #444;
+            font-size: 14px;
+        }
+        .pdf-controls span { margin-left: 15px; color: #ccc; }
+        .close-pdf { cursor: pointer; color: #ff5555 !important; font-weight: bold; }
+        .close-pdf:hover { color: #ff8888 !important; }
+
+        .pdf-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+            background: #525659;
+        }
+
+        .a4-page {
+            background: white;
+            color: #222;
+            width: 100%;
+            max-width: 650px;
+            min-height: 800px;
+            padding: 40px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            position: relative;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .confidential-stamp {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            border: 3px solid #d9534f;
+            color: #d9534f;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 4px 12px;
+            transform: rotate(12deg);
+            border-radius: 4px;
+            opacity: 0.85;
+        }
+        .doc-info { font-size: 12px; color: #666; margin: 8px 0 15px; }
+        .pdf-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; }
+        .pdf-table th, .pdf-table td { border: 1px solid #ccc; padding: 8px 10px; text-align: left; }
+        .pdf-table th { background: #f0f0f0; }
+        .doc-note { background: #fff8e1; border-left: 4px solid #ffc107; padding: 12px; margin-top: 20px; color: #555; }
     </style>
 </head>
 <body>
@@ -116,9 +183,9 @@
         </div>
 
         <div class="icon-item" id="icon-p1" onclick="openPuzzle('p1', '問題 1：請輸入系統啟動密碼', '1234')">
-            <img src="https://img.icons8.com/color/96/000000/folder-invoices.png" alt="圖示">
+            <img src=https://img.icons8.com/color/96/journal.png" alt="圖示">
             <div class="badge-count" id="badge-p1">4</div>
-            <div class="icon-title">機密資料夾</div>
+            <div class="icon-title">資源抽調日記</div>
         </div>
 
         <div class="icon-item" id="icon-p2" onclick="openPuzzle('p2', '問題 2：台灣最高的山峰名稱？', '玉山')">
@@ -356,11 +423,21 @@
         function submitAnswer() {
             let input = document.getElementById('modal-ans').value.trim();
             if (input === currentCorrectAns) {
-                alert("🎉 答案正確！");
+                // 1. 紀錄答對次數 +1 並儲存
                 let data = getLocalData();
                 data.counts[currentPId] = (data.counts[currentPId] || 0) + 1;
                 saveLocalData(data);
+        
+                // 2. 關閉輸入密碼視窗
                 closeModal('puzzle-modal');
+        
+                // 3. 判斷：如果是「資源抽調日記」，答對後直接彈出 PDF 視窗！
+                if (currentPId === 'p_diary') {
+                    document.getElementById('pdf-viewer-modal').style.display = 'flex';
+                } else {
+                    // 其他普通題目答對時顯示提示
+                    alert("🎉 答案正確！");
+                }
             } else {
                 alert("❌ 答案錯誤，請再試一次！");
             }
