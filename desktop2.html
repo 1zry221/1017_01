@@ -257,6 +257,67 @@
             height: 100%;
             border: none;
         }
+        /* ================= 擬真 安保系統狀態 (紅橘警示風) ================= */
+        .security-window {
+            width: 85%;
+            max-width: 780px;
+            height: 75vh;
+            background: #140505;
+            border: 1px solid #ff4444;
+            border-radius: 6px;
+            box-shadow: 0 0 25px rgba(255, 68, 68, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-family: 'Consolas', 'Courier New', monospace;
+        }
+
+        .security-toolbar {
+            background: #2b0a0a;
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ff4444;
+            color: #ff9999;
+            font-size: 13px;
+        }
+
+        .close-security { cursor: pointer; color: #ff5555; font-weight: bold; }
+        .close-security:hover { color: #ff8888; }
+
+        .security-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #0a0202;
+            color: #ff6666;
+            font-size: 13.5px;
+            line-height: 1.6;
+            text-shadow: 0 0 3px rgba(255, 68, 68, 0.4);
+            text-align: left;
+        }
+
+        .security-text {
+            font-family: 'Consolas', 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            margin: 0;
+        }
+
+        /* 醒目的抄寫備註提示框 */
+        .code-highlight-box {
+            background: rgba(255, 204, 0, 0.12);
+            border: 1.5px dashed #ffcc00;
+            color: #ffcc00;
+            padding: 12px 15px;
+            margin-top: 15px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 6px;
+            text-shadow: 0 0 4px rgba(255, 204, 0, 0.4);
+            line-height: 1.6;
+        }
     </style>
 </head>
 <body>
@@ -284,6 +345,12 @@
             <img src="https://img.icons8.com/color/96/pdf.png" alt="專案推薦信">
             <div class="badge-count" id="badge-p_recommendation">4</div>
             <div class="icon-title">[推薦]專案推薦信.pdf</div>
+        </div>
+        <!-- 安保系統狀態圖示 (新增) -->
+        <div class="icon-item" id="icon-p_security" onclick="openPuzzle('p_security', '【安保系統狀態】請輸入安保覆蓋碼：', 'E64')">
+            <img src="https://img.icons8.com/color/96/shield.png" alt="安保系統狀態">
+            <div class="badge-count" id="badge-p_security">4</div>
+            <div class="icon-title">安保系統狀態.sys</div>
         </div>
     </div>
 
@@ -427,6 +494,38 @@
         </div>
     </div>
 
+    <!-- 擬真 安保系統狀態 Modal -->
+    <div class="modal-overlay" id="security-viewer-modal">
+        <div class="security-window">
+            <div class="security-toolbar">
+                <span>🛡️ POLARIS_SECURITY_SYSTEM - STATUS_LOG</span>
+                <span class="close-security" onclick="closeModal('security-viewer-modal')">✕ 關閉</span>
+            </div>
+            <div class="security-body">
+                <pre class="security-text">==================================================
+[POLARIS_SECURITY_SYSTEM] DEFENSE_&_STATUS_LOG
+--------------------------------------------------
+>> SYSTEM_STATUS : DEGRADED (Level-2 Alert)
+>> SECTOR_01     : LOCKDOWN_OVERRIDDEN
+>> MAIN_VAULT    : ACCESSED_BY_CLEARANCE_E
+>> LOG_ID        : SEC_AUDIT_20261017
+
+--------------------------------------------------
+[CLEARANCE_RECORD]
+>> AUTHORIZATION CODE : E64
+>> STATUS             : VERIFIED / WRITTEN OFF
+>> TIMESTAMP          : 2026-10-17 01:15:22
+==================================================</pre>
+                <!-- 抄寫提醒備註框 -->
+                <div class="code-highlight-box">
+                    ⚠️ 【關鍵線索提示】：<br>
+                    請玩家務必將此核銷代碼抄寫上記錄下來：<span style="font-size: 18px; color: #ffffff; background: #d97706; padding: 2px 8px; border-radius: 4px; margin: 0 4px;">E64</span><br>
+                    （後續關卡將需要輸入此代碼！）
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 全白鎖死畫面 -->
     <div id="white-screen-lock"></div>
 
@@ -462,7 +561,7 @@
             'LC694650', 'RT742822', 'TS451120', 'HK621906', 'UC899609', 
             'MW735695', 'SH014740', 'OH435324', 'HR164810'
         ];
-        const PUZZLE_IDS = ['p_chat', 'p_roster', 'p_recommendation'];
+        const PUZZLE_IDS = ['p_chat', 'p_roster', 'p_recommendation', 'p_security'];
         const MAX_CORRECT = 4;
         const STORAGE_KEY = 'desktop2_game_data';
         
@@ -601,6 +700,8 @@
                     document.getElementById('roster-viewer-modal').style.display = 'flex';
                 } else if (currentPId === 'p_recommendation') {
                     document.getElementById('recommendation-viewer-modal').style.display = 'flex';
+                } else if (currentPId === 'p_security') {
+                    document.getElementById('security-viewer-modal').style.display = 'flex';
                 } else {
                     // 其他普通題目答對時顯示提示
                     alert("🎉 答案正確！");
