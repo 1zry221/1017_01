@@ -171,23 +171,120 @@
         .pdf-table th, .pdf-table td { border: 1px solid #ccc; padding: 8px 10px; text-align: left; }
         .pdf-table th { background: #f0f0f0; }
         .doc-note { background: #fff8e1; border-left: 4px solid #ffc107; padding: 12px; margin-top: 20px; color: #555; }
+        /* 相片檢視器視窗 */
+        .photo-window {
+            width: 90%;
+            max-width: 520px;
+            background: #1e1e1e;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.9);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            color: white;
+        }
+        .photo-toolbar {
+            background: #2d2d2d;
+            padding: 10px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #444;
+            font-size: 13px;
+            color: #ccc;
+        }
+        .close-photo { cursor: pointer; color: #ff5555; font-weight: bold; }
+        .close-photo:hover { color: #ff8888; }
+        
+        .photo-body {
+            padding: 25px 15px;
+            display: flex;
+            justify-content: center;
+            background: #121212;
+            overflow-y: auto;
+            max-height: 80vh;
+        }
+        
+        /* 復古拍立得相框 (稍微傾斜營造詭異感) */
+        .polaroid-card {
+            background: #fdfdfd;
+            padding: 15px 15px 20px 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.7);
+            transform: rotate(-1.5deg);
+            width: 100%;
+            max-width: 400px;
+            border-radius: 2px;
+        }
+        
+        .photo-wrapper {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            overflow: hidden;
+            background: #000;
+        }
+        
+        .base-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: sepia(0.2) contrast(1.1) brightness(0.9);
+        }
+        
+        /* 紅筆叉叉 Overlay */
+        .red-x-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        
+        /* 底部激進手寫字體 */
+        .photo-caption {
+            margin-top: 15px;
+            text-align: center;
+            color: #111;
+        }
+        
+        .handwriting-text {
+            font-family: "DFKai-SB", "Kaiti", "Georgia", serif;
+            font-size: 17px;
+            font-weight: bold;
+            color: #b71c1c;
+            margin-bottom: 8px;
+            line-height: 1.4;
+            text-shadow: 0 0 1px rgba(183, 28, 28, 0.4);
+        }
+        
+        .creepy-subtext {
+            font-size: 12px;
+            color: #666;
+            border-top: 1px stroke #e0e0e0;
+            padding-top: 6px;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
 
-    <!-- 桌面圖示網格 (1個本機 + 8個題目圖示) -->
+    <!-- 桌面圖示網格 (1個本機 + 題目圖示) -->
     <div class="desktop-grid">
         <div class="icon-item locked" id="icon-this-pc" onclick="clickThisPC()">
             <img src="https://img.icons8.com/color/96/000000/monitor.png" alt="本機">
             <div class="icon-title">本機</div>
         </div>
-        <!-- HTML 桌面圖示定義 -->
         <div class="icon-item" id="icon-p_diary" onclick="openPuzzle('p_diary', '【資源抽調日記】請輸入查閱密碼：', '預設密碼1234')">
             <img src="https://img.icons8.com/color/96/journal.png" alt="資源抽調日記">
             <div class="badge-count" id="badge-p_diary">4</div>
             <div class="icon-title">資源抽調日記</div>
         </div>
-        
+        <div class="icon-item" id="icon-p_album" onclick="openPuzzle('p_album', '【秘密相簿】請輸入查看密碼：', '1016')">
+            <img src="https://img.icons8.com/color/96/gallery.png" alt="秘密相簿">
+            <div class="badge-count" id="badge-p_album">4</div>
+            <div class="icon-title">秘密相簿.jpg</div>
+        </div>
     </div>
 
     <!-- ================= 擬真 Taskbar 結構 ================= -->
@@ -245,7 +342,42 @@
             </div>
         </div>
     </div>
-
+    <!-- 擬真相片檢視器 Modal -->
+    <div class="modal-overlay" id="photo-viewer-modal">
+        <div class="photo-window">
+            <!-- 上方標題列 -->
+            <div class="photo-toolbar">
+                <span>🖼️ 相片檢視器 - IMG_20261014_SECRET.jpg</span>
+                <span class="close-photo" onclick="closeModal('photo-viewer-modal')">✕ 關閉</span>
+            </div>
+    
+            <!-- 相片內容區 (拍立得風格) -->
+            <div class="photo-body">
+                <div class="polaroid-card">
+                    <div class="photo-wrapper">
+                        <!-- 合照背景 (可自由更換相片連結) -->
+                        <img src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=600" alt="舊合照" class="base-photo">
+                        
+                        <!-- SVG 紅筆劃破與叉叉效果 (自動疊加在右側女人臉上) -->
+                        <svg class="red-x-overlay" viewBox="0 0 100 100" preserveAspectRatio="none">
+                            <!-- 紅筆瘋狂圈劃 -->
+                            <path d="M 52,20 Q 75,10 80,35 T 55,45 Z" fill="none" stroke="#d32f2f" stroke-width="3" opacity="0.8" />
+                            <!-- 叉叉第一筆 -->
+                            <path d="M 50,15 L 85,55" stroke="#d32f2f" stroke-width="5" stroke-linecap="round" />
+                            <!-- 叉叉第二筆 -->
+                            <path d="M 85,15 L 50,55" stroke="#d32f2f" stroke-width="5" stroke-linecap="round" />
+                        </svg>
+                    </div>
+    
+                    <!-- 底下激進留言與手寫字體 -->
+                    <div class="photo-caption">
+                        <p class="handwriting-text">「為什麼要背叛我... 既然得不到妳，那就大家一起死！」</p>
+                        <p class="creepy-subtext">【相片背面血跡留言】：2026.10.16 終結一切。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- 本機成功 Modal -->
     <div class="modal-overlay" id="this-pc-modal">
         <div class="window-box">
@@ -287,7 +419,7 @@
     </div>
 
     <script>
-        const PUZZLE_IDS = ['p_diary'];
+        const PUZZLE_IDS = ['p_diary', 'p_album'];
         const MAX_CORRECT = 4;
         const STORAGE_KEY = 'desktop1_game_data';
         
@@ -395,7 +527,10 @@
                 // 3. 判斷：如果是「資源抽調日記」，答對後直接彈出 PDF 視窗！
                 if (currentPId === 'p_diary') {
                     document.getElementById('pdf-viewer-modal').style.display = 'flex';
-                } else {
+                } else if (currentPId === 'p_album') {
+                    // 跳出 相片檢視器 視窗
+                    document.getElementById('photo-viewer-modal').style.display = 'flex';
+                }else {
                     // 其他普通題目答對時顯示提示
                     alert("🎉 答案正確！");
                 }
