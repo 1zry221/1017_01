@@ -171,7 +171,7 @@
         .pdf-table th, .pdf-table td { border: 1px solid #ccc; padding: 8px 10px; text-align: left; }
         .pdf-table th { background: #f0f0f0; }
         .doc-note { background: #fff8e1; border-left: 4px solid #ffc107; padding: 12px; margin-top: 20px; color: #555; }
-        /* 相片檢視器視窗 */
+        /* 擬真相片檢視器視窗 */
         .photo-window {
             width: 90%;
             max-width: 520px;
@@ -195,7 +195,7 @@
         }
         .close-photo { cursor: pointer; color: #ff5555; font-weight: bold; }
         .close-photo:hover { color: #ff8888; }
-        
+
         .photo-body {
             padding: 25px 15px;
             display: flex;
@@ -204,8 +204,8 @@
             overflow-y: auto;
             max-height: 80vh;
         }
-        
-        /* 復古拍立得相框 (稍微傾斜營造詭異感) */
+
+        /* 復古拍立得相框 */
         .polaroid-card {
             background: #fdfdfd;
             padding: 15px 15px 20px 15px;
@@ -215,7 +215,7 @@
             max-width: 400px;
             border-radius: 2px;
         }
-        
+
         .photo-wrapper {
             position: relative;
             width: 100%;
@@ -223,16 +223,16 @@
             overflow: hidden;
             background: #000;
         }
-        
+
         .base-photo {
             width: 100%;
             height: 100%;
             object-fit: cover;
             filter: sepia(0.2) contrast(1.1) brightness(0.9);
         }
-        
-        /* 紅筆叉叉 Overlay */
-        .red-x-overlay {
+
+        /* 依參考圖片繪製的瘋狂紅筆線球塗鴉 Overlay */
+        .red-scribble-overlay {
             position: absolute;
             top: 0;
             left: 0;
@@ -240,14 +240,14 @@
             height: 100%;
             pointer-events: none;
         }
-        
-        /* 底部激進手寫字體 */
+
+        /* 底部手寫字體留言 */
         .photo-caption {
             margin-top: 15px;
             text-align: center;
             color: #111;
         }
-        
+
         .handwriting-text {
             font-family: "DFKai-SB", "Kaiti", "Georgia", serif;
             font-size: 17px;
@@ -257,7 +257,7 @@
             line-height: 1.4;
             text-shadow: 0 0 1px rgba(183, 28, 28, 0.4);
         }
-        
+
         .creepy-subtext {
             font-size: 12px;
             color: #666;
@@ -280,7 +280,7 @@
             <div class="badge-count" id="badge-p_diary">4</div>
             <div class="icon-title">資源抽調日記</div>
         </div>
-        <div class="icon-item" id="icon-p_album" onclick="openPuzzle('p_album', '【秘密相簿】請輸入查看密碼：', '1016')">
+        <div class="icon-item" id="icon-p_album" onclick="openPuzzle('p_album', '【秘密相簿】請輸入秘密查閱密碼：', '1016')">
             <img src="https://img.icons8.com/color/96/gallery.png" alt="秘密相簿">
             <div class="badge-count" id="badge-p_album">4</div>
             <div class="icon-title">秘密相簿.jpg</div>
@@ -350,28 +350,25 @@
                 <span>🖼️ 相片檢視器 - IMG_20261014_SECRET.jpg</span>
                 <span class="close-photo" onclick="closeModal('photo-viewer-modal')">✕ 關閉</span>
             </div>
-    
+
             <!-- 相片內容區 (拍立得風格) -->
             <div class="photo-body">
                 <div class="polaroid-card">
                     <div class="photo-wrapper">
-                        <!-- 合照背景 (可自由更換相片連結) -->
-                        <img src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=600" alt="舊合照" class="base-photo">
+                        <!-- 合照背景 -->
+                        <img src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=600" alt="秘密合照" class="base-photo">
                         
-                        <!-- SVG 紅筆劃破與叉叉效果 (自動疊加在右側女人臉上) -->
-                        <svg class="red-x-overlay" viewBox="0 0 100 100" preserveAspectRatio="none">
-                            <!-- 紅筆瘋狂圈劃 -->
-                            <path d="M 52,20 Q 75,10 80,35 T 55,45 Z" fill="none" stroke="#d32f2f" stroke-width="3" opacity="0.8" />
-                            <!-- 叉叉第一筆 -->
-                            <path d="M 50,15 L 85,55" stroke="#d32f2f" stroke-width="5" stroke-linecap="round" />
-                            <!-- 叉叉第二筆 -->
-                            <path d="M 85,15 L 50,55" stroke="#d32f2f" stroke-width="5" stroke-linecap="round" />
+                        <!-- 依參考圖片繪製的紅筆塗銷 SVG -->
+                        <svg class="red-scribble-overlay" viewBox="0 0 100 100" preserveAspectRatio="none">
+                            <path d="M 50,30 a 20,20 0 1,1 -40,0 a 20,20 0 1,1 40,0 Z M 50,30 a 15,15 0 1,1 -30,0 a 15,15 0 1,1 30,0 Z M 50,30 a 10,10 0 1,1 -20,0 a 10,10 0 1,1 20,0 Z M 50,30 a 5,5 0 1,1 -10,0 a 5,5 0 1,1 10,0 Z" fill="none" stroke="#b71c1c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M 50,30 m 0,-18 a 18,18 0 1,0 0,36 a 18,18 0 1,0 0,-36 Z M 50,30 m 0,-13 a 13,13 0 1,0 0,26 a 13,13 0 1,0 0,-26 Z" fill="none" stroke="#b71c1c" stroke-width="2.5"/>
+                            <path d="M 50,30 m 0,-22 a 22,22 0 1,0 0,44 a 22,22 0 1,0 0,-44 Z" fill="none" stroke="#b71c1c" stroke-width="1.5" stroke-dasharray="1 1.5"/>
                         </svg>
                     </div>
-    
+
                     <!-- 底下激進留言與手寫字體 -->
                     <div class="photo-caption">
-                        <p class="handwriting-text">「為什麼要背叛我... 既然得不到妳，那就大家一起死！」</p>
+                        <p class="handwriting-text">「既然得不到妳，那就大家一起死！」</p>
                         <p class="creepy-subtext">【相片背面血跡留言】：2026.10.16 終結一切。</p>
                     </div>
                 </div>
