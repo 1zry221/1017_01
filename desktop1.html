@@ -105,73 +105,53 @@
         .btn-green { background: #28a745; color: white; }
         .btn-red { background: #dc3545; color: white; }
         .btn-warning { background: #ff9800; color: white; }
-        /* 擬真 PDF 視窗樣式 */
-        .pdf-window {
-            width: 80%;
-            max-width: 800px;
-            height: 85vh;
-            background: #323639;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        /* ================= 擬真 CMD 終端機視窗樣式 ================= */
+        .cmd-window {
+            width: 85%;
+            max-width: 780px;
+            height: 80vh;
+            background: #000000;
+            border: 1px solid #444;
+            border-radius: 6px;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.9);
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            color: white;
+            font-family: 'Consolas', 'Courier New', monospace;
         }
 
-        .pdf-toolbar {
-            background: #2a2e31;
-            padding: 10px 20px;
+        .cmd-toolbar {
+            background: #1f1f1f;
+            padding: 8px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #444;
-            font-size: 14px;
+            border-bottom: 1px solid #333;
+            color: #cccccc;
+            font-size: 13px;
         }
-        .pdf-controls span { margin-left: 15px; color: #ccc; }
-        .close-pdf { cursor: pointer; color: #ff5555 !important; font-weight: bold; }
-        .close-pdf:hover { color: #ff8888 !important; }
 
-        .pdf-body {
+        .close-cmd { cursor: pointer; color: #ff5555; font-weight: bold; }
+        .close-cmd:hover { color: #ff8888; }
+
+        .cmd-body {
             flex: 1;
+            padding: 20px;
             overflow-y: auto;
-            padding: 30px;
-            display: flex;
-            justify-content: center;
-            background: #525659;
+            background: #0c0c0c;
+            color: #00ff66; /* 經典終端機螢光綠 */
+            font-size: 13.5px;
+            line-height: 1.55;
+            text-shadow: 0 0 2px rgba(0, 255, 102, 0.4);
+            text-align: left;
         }
 
-        .a4-page {
-            background: white;
-            color: #222;
-            width: 100%;
-            max-width: 650px;
-            min-height: 800px;
-            padding: 40px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-            position: relative;
-            font-size: 14px;
-            line-height: 1.6;
+        .cmd-text {
+            font-family: 'Consolas', 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            margin: 0;
         }
-
-        .confidential-stamp {
-            position: absolute;
-            top: 30px;
-            right: 40px;
-            border: 3px solid #d9534f;
-            color: #d9534f;
-            font-size: 18px;
-            font-weight: bold;
-            padding: 4px 12px;
-            transform: rotate(12deg);
-            border-radius: 4px;
-            opacity: 0.85;
-        }
-        .doc-info { font-size: 12px; color: #666; margin: 8px 0 15px; }
-        .pdf-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; }
-        .pdf-table th, .pdf-table td { border: 1px solid #ccc; padding: 8px 10px; text-align: left; }
-        .pdf-table th { background: #f0f0f0; }
-        .doc-note { background: #fff8e1; border-left: 4px solid #ffc107; padding: 12px; margin-top: 20px; color: #555; }
         /* 擬真相片檢視器視窗 */
         .photo-window {
             width: 90%;
@@ -268,7 +248,7 @@
             <img src="https://img.icons8.com/color/96/000000/monitor.png" alt="本機">
             <div class="icon-title">本機</div>
         </div>
-        <div class="icon-item" id="icon-p_diary" onclick="openPuzzle('p_diary', '【資源抽調日記】請輸入查閱密碼：', '預設密碼1234')">
+        <div class="icon-item" id="icon-p_diary" onclick="openPuzzle('p_diary', '【資源抽調日記】請輸入查閱密碼：', '1234')">
             <img src="https://img.icons8.com/color/96/journal.png" alt="資源抽調日記">
             <div class="badge-count" id="badge-p_diary">4</div>
             <div class="icon-title">資源抽調日記</div>
@@ -332,6 +312,63 @@
                 <input type="text" id="modal-ans" placeholder="請輸入答案" autocomplete="off">
                 <br>
                 <button onclick="submitAnswer()">確認送出</button>
+            </div>
+        </div>
+    </div>
+    <!-- 擬真 CMD 命令提示字元 Modal (資源抽調日記) -->
+    <div class="modal-overlay" id="cmd-viewer-modal">
+        <div class="cmd-window">
+            <div class="cmd-toolbar">
+                <span>💻 C:\WINDOWS\system32\cmd.exe - LOG_RESOURCE_REALLOC_01.SYS</span>
+                <span class="close-cmd" onclick="closeModal('cmd-viewer-modal')">✕ 關閉</span>
+            </div>
+            <div class="cmd-body">
+                <pre class="cmd-text">==================================================
+【極研號 資源覆蓋與申訴紀錄總表】
+檔案編號：LOG_RESOURCE_REALLOC_01.SYS
+保密等級：CLASS-A（權限鎖定：9018）
+==================================================
+
+[紀錄項目 03-FREQ]
+■ 標的物：深空高頻波段感測陣列專用迴路 (申請人：5184)
+■ 執行指令：主電源強制切斷，100% 功率轉移至導航量子矩陣
+■ 系統自動警報：
+  `[ERR-03-992]` 偵測到深空輻射數據流中斷。
+  `[DATA_LOSS]` 連續 730 日歷史採集頻譜發生永久性損毀。
+■ 申訴歷程記錄：
+  - 5184提交「專用迴路復原申請」：累積 54 次
+  - 系統處置結果：全數駁回 (自動回覆：航速優先於非必要科研)
+■ 審核備註：已將5184終端設為「頻率申訴靜音模式」。
+
+--------------------------------------------------
+
+[紀錄項目 05-STR]
+■ 標的物：艦體尾部應力加固材料庫存 (申請人：6989)
+■ 執行指令：徵用 85% 庫存流體，撥轉至導航外牆防護模組
+■ 系統自動警報：
+  `[WARN-05-104]` 艦尾外殼防禦應力係數由 1.80 降至 1.02。
+  `[SAFETY_RISK]` 結構安全邊界已抵達破裂臨界值。
+■ 申訴歷程記錄：
+  - 6989提交「安全材料緊急歸還請求」：累積 42 次
+  - 系統處置結果：全數拒絕 (9018手動覆蓋：結構風險在可承受範圍)
+■ 審核備註：暫停6989對該批材料之調用查詢權限。
+
+--------------------------------------------------
+
+[紀錄項目 06-GRAV]
+■ 標的物：重力補償阻尼電容陣列 (申請人：0896)
+■ 執行指令：調降 06 控制區電容負載，用於導航冷卻池超頻
+■ 系統自動警報：
+  `[WARN-06-011]` 引力場穩定度下降 42%，預估引發不定期區域微失重。
+■ 申訴歷程記錄：
+  - 0896提交「重力阻尼電容維護申請」：累積 61 次
+  - 系統處置結果：全數退件 (原因：重力控制組應自行克服技術偏差)
+■ 審核備註：駁回0896之面談請求，並註記其情緒管理評估異常。
+
+==================================================
+[系統總結]
+全艦資源調配狀態：導航優先權 100%（授權人：9018）
+==================================================</pre>
             </div>
         </div>
     </div>
@@ -510,7 +547,7 @@
         
                 // 3. 判斷：如果是「資源抽調日記」，答對後直接彈出 PDF 視窗！
                 if (currentPId === 'p_diary') {
-                    document.getElementById('pdf-viewer-modal').style.display = 'flex';
+                    document.getElementById('cmd-viewer-modal').style.display = 'flex';
                 } else if (currentPId === 'p_album') {
                     // 跳出 相片檢視器 視窗
                     document.getElementById('photo-viewer-modal').style.display = 'flex';
