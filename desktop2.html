@@ -153,6 +153,70 @@
             word-break: break-all;
             margin: 0;
         }
+        /* ================= 擬真 人員代碼名冊 (深藍檔案表) ================= */
+        .roster-window {
+            width: 85%;
+            max-width: 800px;
+            height: 80vh;
+            background: #111827;
+            border: 1px solid #3b82f6;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            color: #f3f4f6;
+        }
+
+        .roster-toolbar {
+            background: #1e293b;
+            padding: 10px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #3b82f6;
+            font-size: 13px;
+            color: #93c5fd;
+        }
+
+        .close-roster { cursor: pointer; color: #ef4444; font-weight: bold; }
+        .close-roster:hover { color: #fca5a5; }
+
+        .roster-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #0f172a;
+        }
+
+        .roster-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .roster-table th {
+            background: #1e3a8a;
+            color: #93c5fd;
+            padding: 10px;
+            border: 1px solid #1d4ed8;
+            font-weight: bold;
+        }
+
+        .roster-table td {
+            padding: 8px 12px;
+            border: 1px solid #334155;
+            color: #e2e8f0;
+        }
+
+        .roster-table tr:nth-child(even) {
+            background: rgba(30, 41, 59, 0.5);
+        }
+
+        .roster-table tr:hover {
+            background: rgba(59, 130, 246, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -167,7 +231,13 @@
         <div class="icon-item" id="icon-p_chat" onclick="openPuzzle('p_chat', '【極密對話紀錄】請輸入頻道解密碼：', '0019')">
             <img src="https://img.icons8.com/color/96/chat.png" alt="極密對話紀錄">
             <div class="badge-count" id="badge-p_chat">4</div>
-            <div class="icon-title">[私訊]攔截通訊.chat</div>
+            <div class="icon-title">攔截通訊.chat</div>
+        </div>
+        <!-- 人員代碼名單圖示 (新增) -->
+        <div class="icon-item" id="icon-p_roster" onclick="openPuzzle('p_roster', '【極研號 人員代碼名冊】請輸入調閱密碼：', '1234')">
+            <img src="https://img.icons8.com/color/96/contacts.png" alt="人員代碼名單">
+            <div class="badge-count" id="badge-p_roster">4</div>
+            <div class="icon-title">全艦人員代碼.sys</div>
         </div>
     </div>
 
@@ -258,6 +328,45 @@
         </div>
     </div>
 
+    <!-- 擬真 人員代碼名冊 Modal -->
+    <div class="modal-overlay" id="roster-viewer-modal">
+        <div class="roster-window">
+            <div class="roster-toolbar">
+                <span>🗂️ POLARIS_CREW_DIRECTORY - 人員代碼對照表</span>
+                <span class="close-roster" onclick="closeModal('roster-viewer-modal')">✕ 關閉</span>
+            </div>
+            <div class="roster-body">
+                <table class="roster-table">
+                    <thead>
+                        <tr>
+                            <th>姓名</th>
+                            <th>代碼</th>
+                            <th>姓名</th>
+                            <th>代碼</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>林冠伶</td><td>0896</td><td>紀詠心</td><td>5184</td></tr>
+                        <tr><td>宋宜臻</td><td>0395</td><td>蔡宜晅</td><td>0638</td></tr>
+                        <tr><td>汪子晴</td><td>9407</td><td>簡妘臻</td><td>8000</td></tr>
+                        <tr><td>周羽蕎</td><td>9300</td><td>林書蔓</td><td>0373</td></tr>
+                        <tr><td>張馨予</td><td>3094</td><td>黃敘帆</td><td>4343</td></tr>
+                        <tr><td>林欣穎</td><td>7327</td><td>黃筠心</td><td>6989</td></tr>
+                        <tr><td>施品而</td><td>0019</td><td>高以恩</td><td>2164</td></tr>
+                        <tr><td>闕可晴</td><td>5343</td><td>吳秉潔</td><td>5193</td></tr>
+                        <tr><td>林立筑</td><td>0374</td><td>蘇可馨</td><td>3046</td></tr>
+                        <tr><td>葉容秀</td><td>1335</td><td>夏綺</td><td>5086</td></tr>
+                        <tr><td>黃昀孟</td><td>8123</td><td>許詠甯</td><td>4214</td></tr>
+                        <tr><td>余承昀</td><td>2275</td><td>李品誼</td><td>1360</td></tr>
+                        <tr><td>游晨欣</td><td>0522</td><td>黃薇庭</td><td>0090</td></tr>
+                        <tr><td>廖宥淳</td><td>2831</td><td>呂亭儀</td><td>8109</td></tr>
+                        <tr><td>郭芃妤</td><td>8340</td><td>-</td><td>-</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <!-- 全白鎖死畫面 -->
     <div id="white-screen-lock"></div>
 
@@ -293,7 +402,7 @@
             'LC694650', 'RT742822', 'TS451120', 'HK621906', 'UC899609', 
             'MW735695', 'SH014740', 'OH435324', 'HR164810'
         ];
-        const PUZZLE_IDS = ['p_chat'];
+        const PUZZLE_IDS = ['p_chat', 'p_roster'];
         const MAX_CORRECT = 4;
         const STORAGE_KEY = 'desktop2_game_data';
         
@@ -428,6 +537,8 @@
                 // 3. 判斷答對項目，彈出對應 Modal
                 if (currentPId === 'p_chat') {
                     document.getElementById('chat-viewer-modal').style.display = 'flex';
+                } else if (currentPId === 'p_roster') {
+                    document.getElementById('roster-viewer-modal').style.display = 'flex';
                 } else {
                     // 其他普通題目答對時顯示提示
                     alert("🎉 答案正確！");
