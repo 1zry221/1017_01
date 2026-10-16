@@ -181,54 +181,13 @@
             <img src="https://img.icons8.com/color/96/000000/monitor.png" alt="本機">
             <div class="icon-title">本機</div>
         </div>
-
-        <div class="icon-item" id="icon-p1" onclick="openPuzzle('p1', '問題 1：請輸入系統啟動密碼', '1234')">
-            <img src=https://img.icons8.com/color/96/journal.png" alt="圖示">
-            <div class="badge-count" id="badge-p1">4</div>
+        <!-- HTML 桌面圖示定義 -->
+        <div class="icon-item" id="icon-p_diary" onclick="openPuzzle('p_diary', '【資源抽調日記】請輸入查閱密碼：', '預設密碼1234')">
+            <img src="https://img.icons8.com/color/96/journal.png" alt="資源抽調日記">
+            <div class="badge-count" id="badge-p_diary">4</div>
             <div class="icon-title">資源抽調日記</div>
         </div>
-
-        <div class="icon-item" id="icon-p2" onclick="openPuzzle('p2', '問題 2：台灣最高的山峰名稱？', '玉山')">
-            <img src="https://img.icons8.com/color/96/000000/txt.png" alt="圖示">
-            <div class="badge-count" id="badge-p2">4</div>
-            <div class="icon-title">提示筆記.txt</div>
-        </div>
-
-        <div class="icon-item" id="icon-p3" onclick="openPuzzle('p3', '問題 3：1 + 1 等於幾？', '2')">
-            <img src="https://img.icons8.com/color/96/000000/word.png" alt="圖示">
-            <div class="badge-count" id="badge-p3">4</div>
-            <div class="icon-title">物理實驗報告.docx</div>
-        </div>
-
-        <div class="icon-item" id="icon-p4" onclick="openPuzzle('p4', '問題 4：摩斯密碼 ··· --- ··· 代表？', 'SOS')">
-            <img src="https://img.icons8.com/color/96/000000/chrome.png" alt="圖示">
-            <div class="badge-count" id="badge-p4">4</div>
-            <div class="icon-title">Google Chrome</div>
-        </div>
-
-        <div class="icon-item" id="icon-p5" onclick="openPuzzle('p5', '問題 5：十六進位 FF 的十進位數值？', '255')">
-            <img src="https://img.icons8.com/color/96/000000/code.png" alt="圖示">
-            <div class="badge-count" id="badge-p5">4</div>
-            <div class="icon-title">CodeBlocks</div>
-        </div>
-
-        <div class="icon-item" id="icon-p6" onclick="openPuzzle('p6', '問題 6：請輸入英文單字：APPLE', 'APPLE')">
-            <img src="https://img.icons8.com/color/96/000000/calculator.png" alt="圖示">
-            <div class="badge-count" id="badge-p6">4</div>
-            <div class="icon-title">計算機.exe</div>
-        </div>
-
-        <div class="icon-item" id="icon-p7" onclick="openPuzzle('p7', '問題 7：一年有幾個月？', '12')">
-            <img src="https://img.icons8.com/color/96/000000/pdf.png" alt="圖示">
-            <div class="badge-count" id="badge-p7">4</div>
-            <div class="icon-title">機密手冊.pdf</div>
-        </div>
-
-        <div class="icon-item" id="icon-p8" onclick="openPuzzle('p8', '問題 8：請輸入終極解密碼：888', '888')">
-            <img src="https://img.icons8.com/color/96/000000/vlc.png" alt="圖示">
-            <div class="badge-count" id="badge-p8">4</div>
-            <div class="icon-title">媒體播放器</div>
-        </div>
+        
     </div>
 
     <!-- ================= 擬真 Taskbar 結構 ================= -->
@@ -328,7 +287,7 @@
     </div>
 
     <script>
-        const PUZZLE_IDS = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8'];
+        const PUZZLE_IDS = ['p_diary'];
         const MAX_CORRECT = 4;
         const STORAGE_KEY = 'desktop1_game_data';
         
@@ -420,8 +379,10 @@
             document.getElementById(modalId).style.display = 'none';
         }
 
+        // 送出答案邏輯
         function submitAnswer() {
             let input = document.getElementById('modal-ans').value.trim();
+            
             if (input === currentCorrectAns) {
                 // 1. 紀錄答對次數 +1 並儲存
                 let data = getLocalData();
@@ -439,7 +400,7 @@
                     alert("🎉 答案正確！");
                 }
             } else {
-                alert("❌ 答案錯誤，請再試一次！");
+                alert("❌ 密碼錯誤，請再試一次！");
             }
         }
 
