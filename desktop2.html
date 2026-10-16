@@ -318,6 +318,89 @@
             text-shadow: 0 0 4px rgba(255, 204, 0, 0.4);
             line-height: 1.6;
         }
+        /* ================= 擬真 加密對話視窗 (暗紫賽博風) ================= */
+        .chat-window {
+            width: 85%;
+            max-width: 700px;
+            height: 75vh;
+            background: #0f0a1c;
+            border: 1px solid #7c3aed;
+            border-radius: 8px;
+            box-shadow: 0 0 25px rgba(124, 58, 237, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        .chat-toolbar {
+            background: #1e1138;
+            padding: 10px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #7c3aed;
+            color: #c4b5fd;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .close-chat { cursor: pointer; color: #f43f5e; font-weight: bold; }
+        .close-chat:hover { color: #fda4af; }
+
+        .chat-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #0a0614;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .chat-msg {
+            display: flex;
+            flex-direction: column;
+            max-width: 82%;
+        }
+
+        .chat-msg.left { align-self: flex-start; }
+        .chat-msg.right { align-self: flex-end; }
+
+        .msg-header {
+            font-size: 11px;
+            color: #a78bfa;
+            margin-bottom: 4px;
+        }
+
+        .chat-msg.right .msg-header {
+            text-align: right;
+            color: #38bdf8;
+        }
+
+        .msg-bubble {
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13.5px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-word;
+            text-align: left;
+        }
+
+        .chat-msg.left .msg-bubble {
+            background: #2e1065;
+            color: #e9d5ff;
+            border: 1px solid #5b21b6;
+            border-top-left-radius: 2px;
+        }
+
+        .chat-msg.right .msg-bubble {
+            background: #0c4a6e;
+            color: #e0f2fe;
+            border: 1px solid #0284c7;
+            border-top-right-radius: 2px;
+        }
     </style>
 </head>
 <body>
@@ -351,6 +434,12 @@
             <img src="https://img.icons8.com/color/96/shield.png" alt="安保系統狀態">
             <div class="badge-count" id="badge-p_security">4</div>
             <div class="icon-title">安保系統狀態.sys</div>
+        </div>
+        <!-- 加密對話記錄圖示 (新增) -->
+        <div class="icon-item" id="icon-p_talk" onclick="openPuzzle('p_chat', '【通訊紀錄】請輸入解密金鑰以查閱對話：', '請輸入密碼')">
+            <img src="https://img.icons8.com/color/96/speech-bubbles.png" alt="加密對話紀錄">
+            <div class="badge-count" id="badge-p_chat">4</div>
+            <div class="icon-title">加密紀錄.chat</div>
         </div>
     </div>
 
@@ -514,6 +603,66 @@
             </div>
         </div>
     </div>
+
+    <!-- 擬真 加密對話紀錄 Modal -->
+    <div class="modal-overlay" id="chat-viewer-modal">
+        <div class="chat-window">
+            <div class="chat-toolbar">
+                <span>💬 ENCRYPTED_CHAT_LOG [PERSONNEL 3094 ↔ 5184]</span>
+                <span class="close-chat" onclick="closeModal('chat-viewer-modal')">✕ 關閉</span>
+            </div>
+            <div class="chat-body">
+                <!-- 訊息 1 (3094) -->
+                <div class="chat-msg left">
+                    <div class="msg-header">[20:42:15] 人員 3094</div>
+                    <div class="msg-bubble">「剛才9018又強行劃撥了你們頻譜組 20% 的算力吧？
+我在導航塔第一線看著他簽字，他那副高高在上的嘴臉，您是不是也看得很不爽？」</div>
+                </div>
+
+                <!-- 訊息 2 (5184) -->
+                <div class="chat-msg right">
+                    <div class="msg-header">[20:43:02] 人員 5184</div>
+                    <div class="msg-bubble">「15，你是9018導航長身邊的直屬下屬，私下跑來跟別組長官抱怨你的直屬主管，這符合規矩嗎？」</div>
+                </div>
+
+                <!-- 訊息 3 (3094) -->
+                <div class="chat-msg left">
+                    <div class="msg-header">[20:43:45] 人員 3094</div>
+                    <div class="msg-bubble">「直屬主管？規矩？！我和他是同一天進艦、同批受訓通過的！
+當年受訓成績我跟他只差 0.5 分！憑什麼今天他高高在上當我的直屬老大，天天把我當狗一樣指使？！
+我天天給他打雜、整理終端，就是為了等他跌下來的那一天！首席導航員這個位置，原本就該是我的！」</div>
+                </div>
+
+                <!-- 訊息 4 (5184) -->
+                <div class="chat-msg right">
+                    <div class="msg-header">[20:44:20] 人員 5184</div>
+                    <div class="msg-bubble">「15！你瘋了嗎？！9018是你的直屬長官，你在我面前吐露這種篡位野心，我是可以向他舉報你的！」</div>
+                </div>
+
+                <!-- 訊息 5 (3094) -->
+                <div class="chat-msg left">
+                    <div class="msg-header">[20:45:10] 人員 3094</div>
+                    <div class="msg-bubble">「舉報我？組長，我是他的直屬下屬，全艦只有我最清楚他今晚 22:00 量子校正的全部行程與終端密碼！
+我已經私下寫好權限覆蓋程式了。今晚只要 9018在導航塔『出事』，我作為他的直屬第一副手，就能順理成章接管導航塔！
+到時候我就是新的首席！只要您今晚裝作不知道，等我上位，我立刻把被扣的算力和預算全數歸還給你們頻譜組！」</div>
+                </div>
+
+                <!-- 訊息 6 (5184) -->
+                <div class="chat-msg right">
+                    <div class="msg-header">[20:46:00] 人員 5184</div>
+                    <div class="msg-bubble">「你……你竟然想除掉你的直屬長官？！這太瘋狂了，我絕不可能配合你！」</div>
+                </div>
+
+                <!-- 訊息 7 (3094) -->
+                <div class="chat-msg left">
+                    <div class="msg-header">[20:46:30] 人員 3094</div>
+                    <div class="msg-bubble">「您不配合也得配合，組長。這段私訊我已經加密存備份了。
+今晚9018要是出事，您猜其他人是會相信我一個『忠心的直屬下屬』，還是會懷疑您這個被他扣光算力、早就心生怨恨的組長？
+今晚這局我勢在必得。首席的位置我拿定了，誰擋我，我就讓誰跟我一起陪葬。」</div>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <!-- 全白鎖死畫面 -->
     <div id="white-screen-lock"></div>
@@ -550,7 +699,7 @@
             'LC694650', 'RT742822', 'TS451120', 'HK621906', 'UC899609', 
             'MW735695', 'SH014740', 'OH435324', 'HR164810'
         ];
-        const PUZZLE_IDS = ['p_chat', 'p_roster', 'p_recommendation', 'p_security'];
+        const PUZZLE_IDS = ['p_chat', 'p_roster', 'p_recommendation', 'p_security', 'p_talk'];
         const MAX_CORRECT = 4;
         const STORAGE_KEY = 'desktop2_game_data';
         
@@ -691,6 +840,8 @@
                     document.getElementById('recommendation-viewer-modal').style.display = 'flex';
                 } else if (currentPId === 'p_security') {
                     document.getElementById('security-viewer-modal').style.display = 'flex';
+                } else if (currentPId === 'p_talk') {
+                    document.getElementById('chat-viewer-modal').style.display = 'flex';
                 } else {
                     // 其他普通題目答對時顯示提示
                     alert("🎉 答案正確！");
