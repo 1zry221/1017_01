@@ -619,15 +619,15 @@
 [POLARIS_SYSTEM_AUDIT_LOG] 2026-10-14 02:11:09
 --------------------------------------------------
 >> TRACE_ID    : MAT-SUPPLY-9941
->> INITIATOR   : USER_21 [SUPPLY_DEPT]
+>> INITIATOR   : USER_0090 [SUPPLY_DEPT]
 >> ACTION      : MANIFEST_ALTERATION_ATTEMPT
 >> STATUS      : REJECTED_BY_SYSTEM (Discrepancy +38.5%)
->> OVERRIDE    : USER_20 [AUDIT_DEPT]
+>> OVERRIDE    : USER_2164 [AUDIT_DEPT]
 >> ACTION      : MANUAL_FORCE_CLEARANCE
 >> FLAG        : [WARNING] SUSPICION_OF_COLLUSION
 >> METRIC      : UNACCOUNTED_RESOURCE_DRAIN
 --------------------------------------------------
->> NV-01_NOTES :
+>> NV-9018_NOTES :
 "Audit evidence fully compiled. Case reference: COURT_MARTIAL_01. Archive encrypted and locked."
 ==================================================</pre>
             </div>
@@ -796,7 +796,7 @@
                 } else if (currentPId === 'p_weapons') {
                     document.getElementById('weapons-viewer-modal').style.display = 'flex';
                     // 觸發打字動畫
-                    const textContent = `--------------------------------------------------\n[驗證成功 —— 檔案已解封]\n\n■ 異常申領紀錄存根：\n- 物品名稱：高硬度合金維修匕首 (編號：WPN-27-B)\n- 申領人員：27 號 (跨域支援技師)\n- 申領時間：案發前夕 22:15\n- 歸還狀態：【未歸還】(警告：該刃具目前仍由 27 號私自持有中)\n\n■ 系統警示：\n  \`[SECURITY_ALERT]\` 27 號並非安保人員，無權在非維修時段持有銳利刃具。\n  \`[LOCATION]\` 門禁追蹤顯示，27 號曾攜帶該刃具於導航艙外走廊停留 18 分鐘。\n==================================================`;
+                    const textContent = `--------------------------------------------------\n[驗證成功 —— 檔案已解封]\n\n■ 異常申領紀錄存根：\n- 物品名稱：高硬度合金維修匕首 (編號：WPN-27-B)\n- 申領人員：3046\n- 申領時間：10/13 22:15\n- 歸還狀態：【未歸還】(警告：該刃具目前仍由3046私自持有中)\n\n■ 系統警示：\n  \`[SECURITY_ALERT]\` 3046並非安保人員，無權在非維修時段持有銳利刃具。\n  \`[LOCATION]\` 門禁追蹤顯示，3046曾攜帶該刃具於導航艙外走廊停留 18 分鐘。\n==================================================`;
                     startTypewriter('weapons-typewriter-text', textContent, 18);
                 } else {
                     // 其他普通題目答對時顯示提示
