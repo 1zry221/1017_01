@@ -239,6 +239,12 @@
             <div class="badge-count" id="badge-p_roster">4</div>
             <div class="icon-title">全艦人員代碼.sys</div>
         </div>
+        <!-- 專案推薦信圖示 (新增) -->
+        <div class="icon-item" id="icon-p_recommendation" onclick="openPuzzle('p_recommendation', '【系統說明】<br>本系統公鑰為 (n, e) = (143, 7)。<br>請根據 RSA 加密原理，破解私鑰金鑰 d 以解鎖檔案：<br><br>1. 將模數 n = 143 分解為兩質數之積：n = p × q （其中 p &lt; q）<br>2. 計算函數：φ(n) = (p - 1) × (q - 1)<br>3. 求出私鑰 d，滿足同餘式：(e × d) ≡ 1 (mod φ(n))<br><br>請輸入 3 位數私鑰解碼 (PASSKEY / d)：', '103')">
+            <img src="https://img.icons8.com/color/96/pdf.png" alt="專案推薦信">
+            <div class="badge-count" id="badge-p_recommendation">4</div>
+            <div class="icon-title">[推薦]專案推薦信.pdf</div>
+        </div>
     </div>
 
     <!-- ================= 擬真 Taskbar 結構 ================= -->
@@ -367,6 +373,20 @@
         </div>
     </div>
 
+    <!-- 擬真 PDF 檢視器 Modal (專案推薦信) -->
+    <div class="modal-overlay" id="recommendation-viewer-modal">
+        <div class="pdf-window">
+            <div class="pdf-toolbar">
+                <span>📄 PDF 檢視器 - 專案推薦信.pdf</span>
+                <span class="close-pdf" onclick="closeModal('recommendation-viewer-modal')" style="cursor:pointer; color:#ff5555; font-weight:bold;">✕ 關閉</span>
+            </div>
+            <div class="pdf-body">
+                <!-- 嵌入您上傳到 GitHub 的 recommendation.pdf 檔案 -->
+                <iframe src="recommendation.pdf"></iframe>
+            </div>
+        </div>
+    </div>
+
     <!-- 全白鎖死畫面 -->
     <div id="white-screen-lock"></div>
 
@@ -402,7 +422,7 @@
             'LC694650', 'RT742822', 'TS451120', 'HK621906', 'UC899609', 
             'MW735695', 'SH014740', 'OH435324', 'HR164810'
         ];
-        const PUZZLE_IDS = ['p_chat', 'p_roster'];
+        const PUZZLE_IDS = ['p_chat', 'p_roster', 'p_recommendation'];
         const MAX_CORRECT = 4;
         const STORAGE_KEY = 'desktop2_game_data';
         
@@ -539,6 +559,8 @@
                     document.getElementById('chat-viewer-modal').style.display = 'flex';
                 } else if (currentPId === 'p_roster') {
                     document.getElementById('roster-viewer-modal').style.display = 'flex';
+                } else if (currentPId === 'p_recommendation') {
+                    document.getElementById('recommendation-viewer-modal').style.display = 'flex';
                 } else {
                     // 其他普通題目答對時顯示提示
                     alert("🎉 答案正確！");
