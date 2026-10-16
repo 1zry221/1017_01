@@ -346,8 +346,8 @@
             <div class="badge-count" id="badge-p_recommendation">4</div>
             <div class="icon-title">[推薦]專案推薦信.pdf</div>
         </div>
-        <!-- 安保系統狀態圖示 (新增) -->
-        <div class="icon-item" id="icon-p_security" onclick="openPuzzle('p_security', '【安保系統狀態】請輸入安保覆蓋碼：', 'E64')">
+        <!-- 安保系統狀態圖示 -->
+        <div class="icon-item" id="icon-p_security" onclick="openPuzzle('p_security', '【安保系統狀態】請輸入查閱密碼：', '請輸入密碼')">
             <img src="https://img.icons8.com/color/96/shield.png" alt="安保系統狀態">
             <div class="badge-count" id="badge-p_security">4</div>
             <div class="icon-title">安保系統狀態.sys</div>
@@ -494,38 +494,24 @@
         </div>
     </div>
 
-    <!-- 擬真 安保系統狀態 Modal -->
+    <!-- 簡化版 安保系統狀態 Modal -->
     <div class="modal-overlay" id="security-viewer-modal">
-        <div class="security-window">
-            <div class="security-toolbar">
-                <span>🛡️ POLARIS_SECURITY_SYSTEM - STATUS_LOG</span>
-                <span class="close-security" onclick="closeModal('security-viewer-modal')">✕ 關閉</span>
+        <div class="window-box" style="width: 400px; text-align: center;">
+            <div class="window-header">
+                <span>🛡️ 安保系統狀態</span>
+                <span style="cursor:pointer;" onclick="closeModal('security-viewer-modal')">✕</span>
             </div>
-            <div class="security-body">
-                <pre class="security-text">==================================================
-[POLARIS_SECURITY_SYSTEM] DEFENSE_&_STATUS_LOG
---------------------------------------------------
->> SYSTEM_STATUS : DEGRADED (Level-2 Alert)
->> SECTOR_01     : LOCKDOWN_OVERRIDDEN
->> MAIN_VAULT    : ACCESSED_BY_CLEARANCE_E
->> LOG_ID        : SEC_AUDIT_20261017
-
---------------------------------------------------
-[CLEARANCE_RECORD]
->> AUTHORIZATION CODE : E64
->> STATUS             : VERIFIED / WRITTEN OFF
->> TIMESTAMP          : 2026-10-17 01:15:22
-==================================================</pre>
-                <!-- 抄寫提醒備註框 -->
-                <div class="code-highlight-box">
-                    ⚠️ 【關鍵線索提示】：<br>
-                    請玩家務必將此核銷代碼抄寫上記錄下來：<span style="font-size: 18px; color: #ffffff; background: #d97706; padding: 2px 8px; border-radius: 4px; margin: 0 4px;">E64</span><br>
-                    （後續關卡將需要輸入此代碼！）
-                </div>
+            <div class="window-body" style="padding: 30px 20px;">
+                <h2 style="font-size: 26px; color: #111; font-weight: bold; letter-spacing: 1px;">
+                    核銷代碼：<span style="color: #d97706; font-size: 30px;">E64</span>
+                </h2>
+                <p style="font-size: 13px; color: #666; margin-top: 15px;">
+                    （請務必將此代碼抄寫下記錄）
+                </p>
             </div>
         </div>
     </div>
-
+    
     <!-- 全白鎖死畫面 -->
     <div id="white-screen-lock"></div>
 
