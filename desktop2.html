@@ -435,11 +435,17 @@
             <div class="badge-count" id="badge-p_security">4</div>
             <div class="icon-title">安保系統狀態.sys</div>
         </div>
-        <!-- 加密對話記錄圖示 (新增) -->
-        <div class="icon-item" id="icon-p_talk" onclick="openPuzzle('p_chat', '【通訊紀錄】請輸入解密金鑰以查閱對話：', '請輸入密碼')">
-            <img src="https://img.icons8.com/color/96/speech-bubbles.png" alt="加密對話紀錄">
-            <div class="badge-count" id="badge-p_chat">4</div>
-            <div class="icon-title">加密紀錄.chat</div>
+        <!-- 加密對話記錄圖示 (不破圖 離線版) -->
+        <div class="icon-item" id="icon-p_talk" onclick="openPuzzle('p_talk', '【通訊紀錄】請輸入解密密碼以查閱對話：', '請輸入密碼')">
+            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%237c3aed'/><path d='M28 32 h44 a6 6 0 0 1 6 6 v22 a6 6 0 0 1 -6 6 h-22 l-12 12 v-12 h-10 a6 6 0 0 1 -6 -6 v-22 a6 6 0 0 1 6 -6 z' fill='white'/><circle cx='40' cy='49' r='4' fill='%237c3aed'/><circle cx='50' cy='49' r='4' fill='%237c3aed'/><circle cx='60' cy='49' r='4' fill='%237c3aed'/></svg>" alt="加密對話紀錄">
+            <div class="badge-count" id="badge-p_talk">4</div>
+            <div class="icon-title">[對話]加密紀錄.chat</div>
+        </div>
+        <!-- 重力閥數值調校表圖示 -->
+        <div class="icon-item" id="icon-p_gravity" onclick="openPuzzle('p_gravity', '【系統說明】請輸入重力閥調校密碼：', '14')">
+            <img src="https://img.icons8.com/color/96/gauge.png" alt="重力閥數值調校表">
+            <div class="badge-count" id="badge-p_gravity">4</div>
+            <div class="icon-title">[調校]重力閥數值調校表.sys</div>
         </div>
     </div>
 
@@ -663,6 +669,27 @@
             </div>
         </div>
     </div>
+
+    <!-- 簡化版 重力閥數值調校表 Modal -->
+    <div class="modal-overlay" id="gravity-viewer-modal">
+        <div class="window-box" style="width: 420px; text-align: center;">
+            <div class="window-header">
+                <span>⚙️ 重力閥數值調校表</span>
+                <span style="cursor:pointer;" onclick="closeModal('gravity-viewer-modal')">✕</span>
+            </div>
+            <div class="window-body" style="padding: 30px 20px;">
+                <p style="font-size: 16px; color: #333; margin-bottom: 10px; font-weight: 500;">
+                    修復了部分系統，核銷代碼為：
+                </p>
+                <h2 style="font-size: 32px; color: #d97706; font-weight: bold; letter-spacing: 2px; margin: 10px 0;">
+                    G14
+                </h2>
+                <p style="font-size: 13px; color: #666; margin-top: 15px;">
+                    （請務必將此代碼抄寫下記錄）
+                </p>
+            </div>
+        </div>
+    </div>
     
     <!-- 全白鎖死畫面 -->
     <div id="white-screen-lock"></div>
@@ -699,7 +726,7 @@
             'LC694650', 'RT742822', 'TS451120', 'HK621906', 'UC899609', 
             'MW735695', 'SH014740', 'OH435324', 'HR164810'
         ];
-        const PUZZLE_IDS = ['p_chat', 'p_roster', 'p_recommendation', 'p_security', 'p_talk'];
+        const PUZZLE_IDS = ['p_chat', 'p_roster', 'p_recommendation', 'p_security', 'p_talk', 'p_gravity'];
         const MAX_CORRECT = 4;
         const STORAGE_KEY = 'desktop2_game_data';
         
@@ -842,6 +869,8 @@
                     document.getElementById('security-viewer-modal').style.display = 'flex';
                 } else if (currentPId === 'p_talk') {
                     document.getElementById('chat-viewer-modal').style.display = 'flex';
+                } else if (currentPId === 'p_gravity') {
+                    document.getElementById('gravity-viewer-modal').style.display = 'flex';
                 } else {
                     // 其他普通題目答對時顯示提示
                     alert("🎉 答案正確！");
