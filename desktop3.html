@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Windows 桌面 - 闖關機 1</title>
+    <title>Windows 桌面 - 闖關機 3</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Microsoft JhengHei", "Segoe UI", sans-serif; user-select: none; }
-        body { width: 100vw; height: 100vh; background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920') center/cover no-repeat; overflow: hidden; position: relative; }
+        @import url('https://fonts.googleapis.com/css2?family=Liu+Jian+Mao+Cao&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", "Microsoft JhengHei", sans-serif; user-select: none; }
+        body { width: 100vw; height: 100vh; background: url('https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat; overflow: hidden; position: relative; }
 
         /* 桌面圖示網格 */
         .desktop-grid { display: grid; grid-template-rows: repeat(5, 95px); grid-auto-flow: column; gap: 15px; padding: 20px; width: fit-content; }
@@ -15,114 +16,213 @@
         .icon-item img { width: 44px; height: 44px; margin-bottom: 4px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
         .icon-title { font-size: 12px; text-align: center; word-break: break-all; line-height: 1.2; }
         
-        /* 左下角小數字角標 (剩餘可用/答對次數，初始為 4) */
+        /* 圖示角標 (剩餘答對次數) */
         .badge-count { position: absolute; bottom: 22px; left: 8px; background: rgba(0, 0, 0, 0.85); color: #00ffcc; font-weight: bold; font-size: 11px; padding: 1px 6px; border-radius: 10px; border: 1px solid #00ffcc; box-shadow: 0 0 5px rgba(0,255,204,0.5); }
-        
-        /* 答對滿 4 次禁用 */
         .icon-item.disabled { opacity: 0.35; filter: grayscale(100%); cursor: not-allowed; pointer-events: none; }
-        /* 本機未解鎖 */
         .icon-item.locked { filter: brightness(0.4) grayscale(80%); }
 
-        /* 工作列與系統時間 */
-        .taskbar { position: absolute; bottom: 0; left: 0; right: 0; height: 40px; background: rgba(20, 20, 20, 0.85); backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; padding: 0 15px; color: white; border-top: 1px solid rgba(255,255,255,0.1); z-index: 100; }
-        .system-tray { font-size: 12px; cursor: pointer; padding: 5px 10px; border-radius: 4px; }
-        .system-tray:hover { background: rgba(255,255,255,0.1); }
+        /* ================= 擬真 Windows 工作列 (Taskbar) ================= */
+        .taskbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 44px;
+            background: rgba(20, 20, 20, 0.92);
+            backdrop-filter: blur(15px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 8px;
+            color: #ffffff;
+            z-index: 9999;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
 
-        /* Modal 彈出視窗 */
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        /* 左側：開始圖示 + 搜尋列 */
+        .taskbar-left { display: flex; align-items: center; gap: 8px; }
+        .start-btn { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 4px; }
+        .start-btn:hover { background: rgba(255, 255, 255, 0.1); }
+        .win-icon { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; width: 16px; height: 16px; }
+        .win-square { background: #0078d7; width: 100%; height: 100%; }
+
+        .search-box {
+            background: #2b2b2b;
+            border: 1px solid #3d3d3d;
+            border-radius: 4px;
+            height: 32px;
+            width: 220px;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            gap: 8px;
+            color: #b0b0b0;
+            font-size: 13px;
+            cursor: text;
+        }
+        .search-box:hover { background: #333333; border-color: #555555; }
+        .taskbar-divider { width: 1px; height: 22px; background: rgba(255, 255, 255, 0.15); margin: 0 2px; }
+
+        /* 中間：白色圓形按鈕 */
+        .taskbar-center { position: absolute; left: 50%; transform: translateX(-50%); }
+        .circle-action-btn {
+            width: 32px;
+            height: 32px;
+            background: #ffffff;
+            color: #111111;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.2s, background 0.2s;
+        }
+        .circle-action-btn:hover { transform: scale(1.08); background: #f0f0f0; }
+
+        /* 右側：系統常駐列 (Tray) */
+        .taskbar-right { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+        .tray-item { display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 4px 6px; border-radius: 4px; }
+        .tray-item:hover { background: rgba(255, 255, 255, 0.1); }
+        .ime-badge { background: rgba(255, 255, 255, 0.18); padding: 1px 5px; border-radius: 3px; font-size: 11px; font-weight: bold; }
+        
+        .datetime-box { text-align: right; font-size: 11px; line-height: 1.2; padding: 3px 6px; border-radius: 4px; cursor: pointer; }
+        .datetime-box:hover { background: rgba(255, 255, 255, 0.1); }
+
+        /* Modal 視窗與全白鎖屏 */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 10000; justify-content: center; align-items: center; }
         .window-box { width: 420px; background: #f0f0f0; border-radius: 8px; border: 1px solid #777; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden; }
         .window-header { background: #0078d7; color: white; padding: 8px 12px; font-weight: bold; display: flex; justify-content: space-between; font-size: 14px; }
         .window-body { padding: 20px; text-align: center; color: #333; }
         .window-body input { width: 80%; padding: 8px; margin: 15px 0; font-size: 16px; text-align: center; border: 1px solid #ccc; border-radius: 4px; }
         .window-body button { padding: 8px 22px; background: #0078d7; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
-        .window-body button:hover { background: #005a9e; }
 
-        /* 全白鎖死畫面 */
         #white-screen-lock { display: none; position: fixed; inset: 0; background: #ffffff; z-index: 999999; }
-
-        /* 管理員後台 Modal */
         .admin-box { width: 480px; background: #2d2d2d; color: white; border-radius: 8px; padding: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.8); }
-        .admin-box h3 { color: #00d2ff; border-bottom: 1px solid #555; padding-bottom: 10px; margin-bottom: 15px; }
         .admin-btn { padding: 8px 15px; margin: 5px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
         .btn-green { background: #28a745; color: white; }
         .btn-red { background: #dc3545; color: white; }
         .btn-warning { background: #ff9800; color: white; }
+        /* ================= 擬真 事故調查紀錄 (橘紅警示風) ================= */
+        .memory-window {
+            width: 85%;
+            max-width: 750px;
+            height: 78vh;
+            background: #180c05;
+            border: 1px solid #f97316;
+            border-radius: 8px;
+            box-shadow: 0 0 25px rgba(249, 115, 22, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-family: 'Consolas', 'Courier New', monospace;
+        }
+
+        .memory-toolbar {
+            background: #2e1505;
+            padding: 10px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #f97316;
+            color: #fdba74;
+            font-size: 13.5px;
+            font-weight: bold;
+        }
+
+        .close-memory { cursor: pointer; color: #ef4444; font-weight: bold; }
+        .close-memory:hover { color: #fca5a5; }
+
+        .memory-body {
+            flex: 1;
+            padding: 22px;
+            overflow-y: auto;
+            background: #0f0703;
+            color: #ffedd5;
+            font-size: 13.5px;
+            line-height: 1.6;
+            text-align: left;
+        }
+
+        .memory-text {
+            white-space: pre-wrap;
+            word-break: break-all;
+            margin: 0;
+            font-family: inherit;
+        }
     </style>
 </head>
 <body>
 
-    <!-- 桌面圖示網格 (共 9 個圖示：1 個本機 + 8 個問題圖示) -->
+    <!-- 桌面圖示網格 (1個本機 + 題目圖示) -->
     <div class="desktop-grid">
-        <!-- 1. 本機 (核心圖示) -->
         <div class="icon-item locked" id="icon-this-pc" onclick="clickThisPC()">
             <img src="https://img.icons8.com/color/96/000000/monitor.png" alt="本機">
             <div class="icon-title">本機</div>
         </div>
-
-        <!-- 2. 問題圖示 1 -->
-        <div class="icon-item" id="icon-p1" onclick="openPuzzle('p1', '問題 1：請輸入系統啟動密碼', '1234')">
-            <img src="https://img.icons8.com/color/96/000000/folder-invoices.png" alt="圖示">
-            <div class="badge-count" id="badge-p1">4</div>
-            <div class="icon-title">機密資料夾</div>
+        <!-- 重力閥數值調校表圖示 -->
+        <div class="icon-item" id="icon-p_gravity" onclick="openPuzzle('p_gravity', '【系統說明】請輸入重力閥調校密碼：', '14')">
+            <img src="https://img.icons8.com/color/96/gauge.png" alt="重力閥數值調校表">
+            <div class="badge-count" id="badge-p_gravity">4</div>
+            <div class="icon-title">[調校]重力閥數值調校表.sys</div>
         </div>
-
-        <!-- 3. 問題圖示 2 -->
-        <div class="icon-item" id="icon-p2" onclick="openPuzzle('p2', '問題 2：台灣最高的山峰名稱？', '玉山')">
-            <img src="https://img.icons8.com/color/96/000000/txt.png" alt="圖示">
-            <div class="badge-count" id="badge-p2">4</div>
-            <div class="icon-title">提示筆記.txt</div>
+        <!-- 航向角度模組圖示 -->
+        <div class="icon-item" id="icon-p_nav" onclick="openPuzzle('p_nav', '==================================================<br>[POLARIS_NAV_CORE_TERMINAL] NODE_09.JAVA<br>SECURITY: SYSTEM_LOCKED<br>==================================================<br><br>import com.polaris.nav.HeadingController;<br><br>public class NavModule {<br>&nbsp;&nbsp;public static void main(String[] args) {<br>&nbsp;&nbsp;&nbsp;&nbsp;// REQUIRED: Turn 1 deg every 30 sec for 3 min<br>&nbsp;&nbsp;&nbsp;&nbsp;HeadingController controller = new HeadingController();<br><br>&nbsp;&nbsp;&nbsp;&nbsp;int durationMinutes = [ ? ];<br>&nbsp;&nbsp;&nbsp;&nbsp;int intervalSeconds = [ ? ];<br>&nbsp;&nbsp;&nbsp;&nbsp;int degreesPerPulse = [ ? ];<br><br>&nbsp;&nbsp;&nbsp;&nbsp;controller.initProfile(durationMinutes, intervalSeconds, degreesPerPulse);<br>&nbsp;&nbsp;&nbsp;&nbsp;String verifyCode = controller.executeAndGetVerifyCode();<br>&nbsp;&nbsp;&nbsp;&nbsp;System.out.println(&quot;VERIFY_CODE: &quot; + verifyCode);<br>&nbsp;&nbsp;}<br>}<br>--------------------------------------------------<br>請輸入 4 位數驗證碼 (VERIFY_CODE / 0606)：', '0606')">
+            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230284c7'/><path d='M50 20 L80 80 L50 65 L20 80 Z' fill='white'/></svg>" alt="航向角度模組">
+            <div class="badge-count" id="badge-p_nav">4</div>
+            <div class="icon-title">[模組]航向角度模組.java</div>
         </div>
-
-        <!-- 4. 問題圖示 3 -->
-        <div class="icon-item" id="icon-p3" onclick="openPuzzle('p3', '問題 3：1 + 1 等於幾？', '2')">
-            <img src="https://img.icons8.com/color/96/000000/word.png" alt="圖示">
-            <div class="badge-count" id="badge-p3">4</div>
-            <div class="icon-title">實驗報告.docx</div>
-        </div>
-
-        <!-- 5. 問題圖示 4 -->
-        <div class="icon-item" id="icon-p4" onclick="openPuzzle('p4', '問題 4：摩斯密碼 ··· --- ··· 代表？', 'SOS')">
-            <img src="https://img.icons8.com/color/96/000000/chrome.png" alt="圖示">
-            <div class="badge-count" id="badge-p4">4</div>
-            <div class="icon-title">Google Chrome</div>
-        </div>
-
-        <!-- 6. 問題圖示 5 -->
-        <div class="icon-item" id="icon-p5" onclick="openPuzzle('p5', '問題 5：十六進位 FF 的十進位數值？', '255')">
-            <img src="https://img.icons8.com/color/96/000000/code.png" alt="圖示">
-            <div class="badge-count" id="badge-p5">4</div>
-            <div class="icon-title">CodeBlocks</div>
-        </div>
-
-        <!-- 7. 問題圖示 6 -->
-        <div class="icon-item" id="icon-p6" onclick="openPuzzle('p6', '問題 6：請輸入英文單字：APPLE', 'APPLE')">
-            <img src="https://img.icons8.com/color/96/000000/calculator.png" alt="圖示">
-            <div class="badge-count" id="badge-p6">4</div>
-            <div class="icon-title">計算機.exe</div>
-        </div>
-
-        <!-- 8. 問題圖示 7 -->
-        <div class="icon-item" id="icon-p7" onclick="openPuzzle('p7', '問題 7：一年有幾個月？', '12')">
-            <img src="https://img.icons8.com/color/96/000000/pdf.png" alt="圖示">
-            <div class="badge-count" id="badge-p7">4</div>
-            <div class="icon-title">機密手冊.pdf</div>
-        </div>
-
-        <!-- 9. 問題圖示 8 -->
-        <div class="icon-item" id="icon-p8" onclick="openPuzzle('p8', '問題 8：請輸入終極解密碼：888', '888')">
-            <img src="https://img.icons8.com/color/96/000000/vlc.png" alt="圖示">
-            <div class="badge-count" id="badge-p8">4</div>
-            <div class="icon-title">媒體播放器</div>
+        <!-- 量子記憶體修復圖示 -->
+        <div class="icon-item" id="icon-p_memory" onclick="openPuzzle('p_memory', '【量子記憶體修復】<br>已知數列 {a_n} 滿足首項與遞迴關係式如下：<br>a₁ = 2, a₂ = 5<br>aₙ₊₂ = 5aₙ₊₁ - 6aₙ (n ≥ 1)<br><br>【問題】 求 a₇ 之值：', '793')">
+            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23ea580c'/><path d='M30 30 h40 v40 h-40 z' fill='none' stroke='white' stroke-width='6'/><path d='M20 40 h10 M20 50 h10 M20 60 h10 M70 40 h10 M70 50 h10 M70 60 h10 M40 20 v10 M50 20 v10 M60 20 v10 M40 70 v10 M50 70 v10 M60 70 v10' stroke='white' stroke-width='4'/></svg>" alt="量子記憶體修復">
+            <div class="badge-count" id="badge-p_memory">4</div>
+            <div class="icon-title">[修復]量子記憶體修復.log</div>
         </div>
     </div>
 
-    <!-- 工作列 -->
+    <!-- ================= 擬真 Taskbar 結構 ================= -->
     <div class="taskbar">
-        <span>🪟 開始</span>
-        <div class="system-tray" id="tray-clock" onclick="clickClockCount()">10:30 上午 (連點3下開啟後台)</div>
+        <!-- 左側選單 -->
+        <div class="taskbar-left">
+            <div class="start-btn" title="開始">
+                <div class="win-icon">
+                    <div class="win-square"></div>
+                    <div class="win-square"></div>
+                    <div class="win-square"></div>
+                    <div class="win-square"></div>
+                </div>
+            </div>
+            <div class="search-box">
+                <span>🔍</span>
+                <span>在此處輸入文字來搜尋</span>
+            </div>
+            <div class="taskbar-divider"></div>
+        </div>
+
+        <!-- 中間圓形按鈕 -->
+        <div class="taskbar-center">
+            <div class="circle-action-btn" title="點擊展開">↓</div>
+        </div>
+
+        <!-- 右側系統常駐列 -->
+        <div class="taskbar-right">
+            <div class="tray-item">
+                <span>🌤️</span>
+                <span>24°C 多雲時晴</span>
+            </div>
+            <div class="tray-item" title="音量">🔊</div>
+            <div class="tray-item" title="網路">📶</div>
+            <div class="ime-badge">中</div>
+            <div class="datetime-box" id="tray-clock" onclick="clickClockCount()" title="連點 3 下開啟管理員後台">
+                <div id="clock-time">上午 03:22</div>
+                <div id="clock-date" style="color: #aaa;">2026/10/16</div>
+            </div>
+        </div>
     </div>
 
-    <!-- 普通解謎 Modal -->
+    <!-- 解謎 Modal -->
     <div class="modal-overlay" id="puzzle-modal">
         <div class="window-box">
             <div class="window-header">
@@ -137,26 +237,92 @@
             </div>
         </div>
     </div>
-
-    <!-- 本機通關成功 Modal (含 QR Code 與 2 分鐘倒數) -->
-    <div class="modal-overlay" id="this-pc-modal">
-        <div class="window-box">
-            <div class="window-header"><span>本機 - 核心檔案解鎖</span></div>
-            <div class="window-body">
-                <h3 style="color:#28a745; margin-bottom: 10px;">🎉 核心驗證成功！</h3>
-                <p id="pc-result-text" style="font-size: 14px; margin-bottom: 15px;">恭喜取得核心線索，請使用手機掃描下方二維碼進入下一關卡：</p>
-                <img id="qr-img" src="" style="width: 160px; height: 160px; border: 1px solid #ccc; padding: 5px;">
-                <p style="color:red; margin-top:15px; font-weight:bold; font-size: 13px;">
-                    ⚠️ 電腦系統將於 <span id="timer-count">120</span> 秒後自我鎖定！
+    <!-- 簡化版 重力閥數值調校表 Modal -->
+    <div class="modal-overlay" id="gravity-viewer-modal">
+        <div class="window-box" style="width: 420px; text-align: center;">
+            <div class="window-header">
+                <span>⚙️ 重力閥數值調校表</span>
+                <span style="cursor:pointer;" onclick="closeModal('gravity-viewer-modal')">✕</span>
+            </div>
+            <div class="window-body" style="padding: 30px 20px;">
+                <p style="font-size: 16px; color: #333; margin-bottom: 10px; font-weight: 500;">
+                    修復了部分系統，核銷代碼為：
+                </p>
+                <h2 style="font-size: 32px; color: #d97706; font-weight: bold; letter-spacing: 2px; margin: 10px 0;">
+                    G14
+                </h2>
+                <p style="font-size: 13px; color: #666; margin-top: 15px;">
+                    （請務必將此代碼抄寫下記錄）
                 </p>
             </div>
         </div>
     </div>
 
+    <!-- 簡化版 航向角度模組 Modal -->
+    <div class="modal-overlay" id="nav-viewer-modal">
+        <div class="window-box" style="width: 440px; text-align: center;">
+            <div class="window-header">
+                <span>🧭 航向角度模組</span>
+                <span style="cursor:pointer;" onclick="closeModal('nav-viewer-modal')">✕</span>
+            </div>
+            <div class="window-body" style="padding: 30px 20px;">
+                <p style="font-size: 16px; color: #333; margin-bottom: 10px; font-weight: 500;">
+                    修復了部分系統，核銷代碼為：
+                </p>
+                <h2 style="font-size: 32px; color: #d97706; font-weight: bold; letter-spacing: 4px; margin: 10px 0;">
+                    L24 &nbsp;&nbsp; B67
+                </h2>
+                <p style="font-size: 13px; color: #666; margin-top: 15px;">
+                    （請務必將此代碼抄寫下記錄）
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 擬真 導航塔事故紀錄 Modal -->
+    <div class="modal-overlay" id="memory-viewer-modal">
+        <div class="memory-window">
+            <div class="memory-toolbar">
+                <span>⚠️ ACCIDENT_INVESTIGATION_LOG [FILE_0638]</span>
+                <span class="close-memory" onclick="closeModal('memory-viewer-modal')">✕ 關閉</span>
+            </div>
+            <div class="memory-body">
+                <pre class="memory-text">==================================================
+【極研號 導航塔重大操作事故 調查紀錄】
+
+■ 責任人員 ：0638
+■ 事故時間 ：6191-09-18 03:14:22
+■ 事故級別 ：LEVEL-2 級航向偏轉失誤
+
+【事故過程描述】
+0638在執行「第 04 區段軌道校正」時，因個人語法語意分析錯誤，誤將偏轉角度設定為 15 度（正確應為 1.5 度），導致星艦防護罩瞬間承受過載推力，頻譜組設備遭高壓電擊穿，造成全艦 15% 能量無端損耗。
+
+--------------------------------------------------
+==================================================
+【9018 處置指示與威脅備註】
+簽署時間：6191-09-18 05:00:00
+==================================================
+
+「10 號，你的粗心與失誤已經嚴重威脅全艦安全。
+ 本事故報告已由我個人暫時扣留，尚未呈報給母星監控網。
+
+ 但你給我聽清楚：
+ 從今天起，你必須無條件配合我所有的導航塔排班與高強度數據清掃。
+ 只要你敢有任何異議、或是再出現一次語法計算失誤，我會立刻將這份報告傳回母星。
+ 屆時你將被剝奪工程師資格，並被直接送上軍事法庭，接受最低 10 年的懲役。
+
+ 不要考驗我的耐性。」
+
+                          簽署人：首席導航長
+==================================================</pre>
+            </div>
+        </div>
+    </div>
+    
     <!-- 全白鎖死畫面 -->
     <div id="white-screen-lock"></div>
 
-    <!-- 隱藏管理員控制面板 Modal (按 Ctrl+Shift+A 或連擊時間開啟) -->
+    <!-- 管理員後台 Modal -->
     <div class="modal-overlay" id="admin-modal">
         <div class="admin-box">
             <h3>⚙️ 隱藏管理員控制台 (單機版)</h3>
@@ -179,16 +345,43 @@
     </div>
 
     <script>
-        // 本網頁的題目 ID 清單
-        const PUZZLE_IDS = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8'];
-        const MAX_CORRECT = 4; // 每題最多可答對次數
-        const STORAGE_KEY = 'desktop1_game_data'; // 每個桌面檔名可使用獨立的 Key
+        // 29 組可通行的密碼清單
+        const VALID_ACCESS_CODES = [
+            'ZK341664', 'KO670360', 'VW239047', 'RG743954', 'AX029069', 
+            'EH567203', 'FT893055', 'SD449847', 'JM347341', 'SP348363', 
+            'BC675309', 'WV499863', 'XG981292', 'LH750729', 'VY238190', 
+            'PJ429636', 'XN893906', 'NV519958', 'XB775589', 'ND138392', 
+            'LC694650', 'RT742822', 'TS451120', 'HK621906', 'UC899609', 
+            'MW735695', 'SH014740', 'OH435324', 'HR164810'
+        ];
+        const PUZZLE_IDS = ['p_gravity', 'p_nav', 'p_memory'];
+        const MAX_CORRECT = 4;
+        const STORAGE_KEY = 'desktop3_game_data';
         
         let currentPId = null;
         let currentCorrectAns = null;
         let clockClickCount = 0;
 
-        // 初始化資料結構
+        // 即時更新系統時間與日期
+        function updateLiveClock() {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            let ampm = hours >= 12 ? '下午' : '上午';
+            hours = hours % 12;
+            hours = hours ? hours : 12; 
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+
+            let year = now.getFullYear();
+            let month = (now.getMonth() + 1).toString().padStart(2, '0');
+            let day = now.getDate().toString().padStart(2, '0');
+
+            document.getElementById('clock-time').innerText = `${ampm} ${hours.toString().padStart(2, '0')}:${minutes}`;
+            document.getElementById('clock-date').innerText = `${year}/${month}/${day}`;
+        }
+        setInterval(updateLiveClock, 1000);
+        updateLiveClock();
+
         function getLocalData() {
             let data = localStorage.getItem(STORAGE_KEY);
             return data ? JSON.parse(data) : { counts: {}, forceUnlock: false, isLocked: false };
@@ -199,11 +392,9 @@
             updateUI();
         }
 
-        // 重新繪製 UI
         function updateUI() {
             let data = getLocalData();
 
-            // 1. 檢測全白鎖定
             if (data.isLocked) {
                 document.getElementById('white-screen-lock').style.display = 'block';
                 return;
@@ -211,7 +402,6 @@
                 document.getElementById('white-screen-lock').style.display = 'none';
             }
 
-            // 2. 更新一般圖示剩餘次數 (上限4次)
             let allAnsweredTwoTimes = true;
             PUZZLE_IDS.forEach(id => {
                 let count = data.counts[id] || 0;
@@ -222,18 +412,15 @@
 
                 if (badge) badge.innerText = remaining;
 
-                // 答對滿 4 次禁用
                 if (count >= MAX_CORRECT && icon) {
                     icon.classList.add('disabled');
                 } else if (icon) {
                     icon.classList.remove('disabled');
                 }
 
-                // 檢查該圖示是否已答對 >= 2 次
                 if (count < 2) allAnsweredTwoTimes = false;
             });
 
-            // 3. 檢查「本機」圖示是否解鎖 (所有圖示 >= 2次 或 中控台強制解鎖)
             let pcIcon = document.getElementById('icon-this-pc');
             if (allAnsweredTwoTimes || data.forceUnlock) {
                 pcIcon.classList.remove('locked');
@@ -242,7 +429,6 @@
             }
         }
 
-        // 開啟普通題目
         function openPuzzle(id, question, answer) {
             let data = getLocalData();
             if ((data.counts[id] || 0) >= MAX_CORRECT) {
@@ -251,7 +437,7 @@
             }
             currentPId = id;
             currentCorrectAns = answer;
-            document.getElementById('modal-q').innerText = question;
+            document.getElementById('modal-q').innerHTML = question;
             document.getElementById('modal-ans').value = '';
             document.getElementById('puzzle-modal').style.display = 'flex';
         }
@@ -260,21 +446,62 @@
             document.getElementById(modalId).style.display = 'none';
         }
 
-        // 送出答案
+        // 全域打字機定時器
+        let typingTimer = null;
+
+        // 打字動畫效果
+        function startTypewriter(elementId, text, speed = 20) {
+            const el = document.getElementById(elementId);
+            el.innerText = '';
+            if (typingTimer) clearInterval(typingTimer);
+            let index = 0;
+            typingTimer = setInterval(() => {
+                if (index < text.length) {
+                    el.innerText += text.charAt(index);
+                    index++;
+                } else {
+                    clearInterval(typingTimer);
+                }
+            }, speed);
+        }
+
+        // 送出答案邏輯
         function submitAnswer() {
             let input = document.getElementById('modal-ans').value.trim();
-            if (input === currentCorrectAns) {
-                alert("🎉 答案正確！");
+            
+            // 判斷答案是否正確（支援多組密碼陣列或單一密碼）
+            let isCorrect = false;
+            if (Array.isArray(currentCorrectAns)) {
+                isCorrect = currentCorrectAns.includes(input);
+            } else {
+                isCorrect = (input === String(currentCorrectAns).toUpperCase());
+            }
+
+            if (isCorrect) {
+                // 1. 紀錄答對次數 +1 並儲存
                 let data = getLocalData();
                 data.counts[currentPId] = (data.counts[currentPId] || 0) + 1;
                 saveLocalData(data);
+
+                // 2. 關閉輸入密碼視窗
                 closeModal('puzzle-modal');
+
+                // 3. 判斷答對項目，彈出對應 Modal
+                if (currentPId === 'p_gravity') {
+                    document.getElementById('gravity-viewer-modal').style.display = 'flex';
+                } else if (currentPId === 'p_nav') {
+                    document.getElementById('nav-viewer-modal').style.display = 'flex';
+                } else if (currentPId === 'p_memory') {
+                    document.getElementById('memory-viewer-modal').style.display = 'flex';
+                } else {
+                    // 其他普通題目答對時顯示提示
+                    alert("🎉 答案正確！");
+                }
             } else {
-                alert("❌ 答案錯誤，請再試一次！");
+                alert("❌ 密碼錯誤，請再試一次！");
             }
         }
 
-        // 點擊「本機」圖示
         function clickThisPC() {
             let pcIcon = document.getElementById('icon-this-pc');
             if (pcIcon.classList.contains('locked')) {
@@ -282,46 +509,42 @@
                 return;
             }
 
-            // 開啟本機題目
             currentPId = 'this_pc_puzzle';
-            currentCorrectAns = 'core999'; // 本機答案
+            currentCorrectAns = 'core999';
             document.getElementById('modal-q').innerText = "【本機核心驗證】請輸入主機核心金鑰：";
             document.getElementById('modal-ans').value = '';
             document.getElementById('puzzle-modal').style.display = 'flex';
 
-            // 修改本機專屬送出邏輯
             document.querySelector('#puzzle-modal button').onclick = function() {
                 if (document.getElementById('modal-ans').value.trim() === currentCorrectAns) {
                     closeModal('puzzle-modal');
-                    triggerThisPCSuccess("https://example.com/stage-target"); // QR Code 目標網址
+                    triggerThisPCSuccess("https://example.com/stage-target");
                 } else {
                     alert("❌ 金鑰不正確！");
                 }
             };
         }
 
-        // 本機答對後：彈出 QR Code + 文字 + 啟動 2 分鐘倒數
         function triggerThisPCSuccess(targetUrl) {
             document.getElementById('qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(targetUrl)}`;
             document.getElementById('this-pc-modal').style.display = 'flex';
 
-            let t = 120; // 120 秒 (2 分鐘)
+            let t = 120;
             let timer = setInterval(() => {
                 t--;
                 document.getElementById('timer-count').innerText = t;
                 if (t <= 0) {
                     clearInterval(timer);
                     let data = getLocalData();
-                    data.isLocked = true; // 設置全白鎖定狀態
+                    data.isLocked = true;
                     saveLocalData(data);
                 }
             }, 1000);
         }
 
-        // 隱藏管理員控制台邏輯
         function openAdminModal() {
             let pin = prompt("請輸入管理員密碼：");
-            if (pin === "8888") { // 預設管理員密碼
+            if (pin === "8888") {
                 document.getElementById('admin-modal').style.display = 'flex';
             } else if (pin !== null) {
                 alert("密碼錯誤！");
@@ -350,14 +573,12 @@
             }
         }
 
-        // 觸發管理員面板方式 1：鍵盤快捷鍵 Ctrl + Shift + A
         document.addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.shiftKey && e.key.toUpperCase() === 'A') {
                 openAdminModal();
             }
         });
 
-        // 觸發管理員面板方式 2：連續點擊右下角時間 3 下
         function clickClockCount() {
             clockClickCount++;
             if (clockClickCount >= 3) {
@@ -368,6 +589,16 @@
         }
 
         window.onload = updateUI;
+        if (window.location.search.includes('reset=true')) {
+            localStorage.removeItem(STORAGE_KEY);
+            alert('已成功重置本頁所有紀錄！');
+            window.location.href = window.location.pathname;
+        }
+
+        window.onload = updateUI;
+    </script>
+</body>
+</html>
     </script>
 </body>
 </html>
