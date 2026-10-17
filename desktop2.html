@@ -441,12 +441,6 @@
             <div class="badge-count" id="badge-p_talk">4</div>
             <div class="icon-title">[對話]加密紀錄.chat</div>
         </div>
-        <!-- 重力閥數值調校表圖示 -->
-        <div class="icon-item" id="icon-p_gravity" onclick="openPuzzle('p_gravity', '【系統說明】請輸入重力閥調校密碼：', '14')">
-            <img src="https://img.icons8.com/color/96/gauge.png" alt="重力閥數值調校表">
-            <div class="badge-count" id="badge-p_gravity">4</div>
-            <div class="icon-title">[調校]重力閥數值調校表.sys</div>
-        </div>
     </div>
 
     <!-- ================= 擬真 Taskbar 結構 ================= -->
@@ -670,26 +664,7 @@
         </div>
     </div>
 
-    <!-- 簡化版 重力閥數值調校表 Modal -->
-    <div class="modal-overlay" id="gravity-viewer-modal">
-        <div class="window-box" style="width: 420px; text-align: center;">
-            <div class="window-header">
-                <span>⚙️ 重力閥數值調校表</span>
-                <span style="cursor:pointer;" onclick="closeModal('gravity-viewer-modal')">✕</span>
-            </div>
-            <div class="window-body" style="padding: 30px 20px;">
-                <p style="font-size: 16px; color: #333; margin-bottom: 10px; font-weight: 500;">
-                    修復了部分系統，核銷代碼為：
-                </p>
-                <h2 style="font-size: 32px; color: #d97706; font-weight: bold; letter-spacing: 2px; margin: 10px 0;">
-                    G14
-                </h2>
-                <p style="font-size: 13px; color: #666; margin-top: 15px;">
-                    （請務必將此代碼抄寫下記錄）
-                </p>
-            </div>
-        </div>
-    </div>
+   
     
     <!-- 全白鎖死畫面 -->
     <div id="white-screen-lock"></div>
@@ -726,7 +701,7 @@
             'LC694650', 'RT742822', 'TS451120', 'HK621906', 'UC899609', 
             'MW735695', 'SH014740', 'OH435324', 'HR164810'
         ];
-        const PUZZLE_IDS = ['p_chat', 'p_roster', 'p_recommendation', 'p_security', 'p_talk', 'p_gravity'];
+        const PUZZLE_IDS = ['p_chat', 'p_roster', 'p_recommendation', 'p_security', 'p_talk'];
         const MAX_CORRECT = 4;
         const STORAGE_KEY = 'desktop2_game_data';
         
@@ -869,8 +844,6 @@
                     document.getElementById('security-viewer-modal').style.display = 'flex';
                 } else if (currentPId === 'p_talk') {
                     document.getElementById('chat-viewer-modal').style.display = 'flex';
-                } else if (currentPId === 'p_gravity') {
-                    document.getElementById('gravity-viewer-modal').style.display = 'flex';
                 } else {
                     // 其他普通題目答對時顯示提示
                     alert("🎉 答案正確！");
