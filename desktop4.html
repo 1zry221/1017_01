@@ -193,6 +193,70 @@
             line-height: 1.5;
             white-space: pre-wrap;
         }
+        /* ================= 擬真 死者觀察日記 (綠光 CMD 終端風) ================= */
+        .diary-window {
+            width: 85%;
+            max-width: 780px;
+            height: 80vh;
+            background: #02120a;
+            border: 1px solid #10b981;
+            border-radius: 8px;
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-family: 'Consolas', 'Courier New', monospace;
+        }
+
+        .diary-toolbar {
+            background: #064e3b;
+            padding: 10px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #10b981;
+            color: #a7f3d0;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .close-diary { cursor: pointer; color: #ef4444; font-weight: bold; }
+        .close-diary:hover { color: #fca5a5; }
+
+        .diary-body {
+            flex: 1;
+            padding: 22px;
+            overflow-y: auto;
+            background: #010a05;
+            color: #34d399;
+            font-size: 13.5px;
+            line-height: 1.6;
+            text-shadow: 0 0 2px rgba(52, 211, 153, 0.4);
+            text-align: left;
+        }
+
+        .diary-entry {
+            background: rgba(16, 185, 129, 0.05);
+            border-left: 3.5px solid #10b981;
+            padding: 14px 16px;
+            border-radius: 0 6px 6px 0;
+            margin-bottom: 18px;
+        }
+
+        .diary-date {
+            color: #6ee7b7;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .diary-content {
+            color: #d1fae5;
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin: 0;
+            font-family: inherit;
+        }
     </style>
 </head>
 <body>
@@ -208,6 +272,12 @@
             <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23dc2626'/><path d='M30 25 h40 v50 h-40 z' fill='none' stroke='white' stroke-width='6'/><path d='M38 37 h24 M38 47 h24 M38 57 h16' stroke='white' stroke-width='4' stroke-linecap='round'/></svg>" alt="行政指令公告">
             <div class="badge-count" id="badge-p_notice">4</div>
             <div class="icon-title">[公告]行政指令_017.doc</div>
+        </div>
+        <!-- 死者觀察日記圖示 -->
+        <div class="icon-item" id="icon-p_diary" onclick="openPuzzle('p_diary', '【身分驗證】請輸入任一人員身分金鑰以解鎖觀察日記：', VALID_ACCESS_CODES)">
+            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23059669'/><path d='M30 25 h40 v50 h-40 z' fill='none' stroke='white' stroke-width='6'/><path d='M38 37 h24 M38 47 h24 M38 57 h16' stroke='white' stroke-width='4' stroke-linecap='round'/></svg>" alt="死者觀察日記">
+            <div class="badge-count" id="badge-p_diary">4</div>
+            <div class="icon-title">[日記]死者觀察日記.log</div>
         </div>
     </div>
 
@@ -310,7 +380,7 @@
 
                     <!-- 未解鎖狀態：輸入密碼框 -->
                     <div id="notice-comments-locked" class="comments-lock-box">
-                        <p style="margin: 0 0 12px 0; color: #f87171; font-size: 14px;">🔒 該區域留言已備份加密，請輸入存取金鑰以檢視內容：</p>
+                        <p style="margin: 0 0 12px 0; color: #f87171; font-size: 14px;">🔒 該區域留言已備份加密，請輸入存取密碼以檢視內容：</p>
                         <div style="display: flex; justify-content: center; gap: 8px;">
                             <input type="password" id="notice-comment-pass" placeholder="請輸入密碼 (預設: 017)" style="padding: 8px 12px; border-radius: 4px; border: 1px solid #7f1d1d; background: #1a0505; color: white; outline: none; width: 200px; text-align: center;">
                             <button onclick="checkNoticePassword()" style="padding: 8px 16px; background: #dc2626; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">解鎖留言</button>
@@ -329,6 +399,49 @@
                             <div class="comment-content">「天天威脅要把人送上軍事法庭，天天扣物資，現在連覺都不讓人睡了？大家每天拼命維持星艦運作，在你眼裡我們連機器都不如，只是隨時可以抽換的耗材！你這種死腦筋的規則怪傑怎麼不乾脆把自己鎖在導航塔裡爛掉？真希望哪天量子過載第一個把你燒成灰！」</div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 擬真 死者觀察日記 Modal -->
+    <div class="modal-overlay" id="diary-viewer-modal">
+        <div class="diary-window">
+            <div class="diary-toolbar">
+                <span>📑 CHIEF_NAVIGATOR_LOG [OBSERVATION_DIARY]</span>
+                <span class="close-diary" onclick="closeModal('diary-viewer-modal')">✕ 關閉</span>
+            </div>
+            <div class="diary-body">
+                <div class="diary-entry">
+                    <div class="diary-date">📅 6191-10-05 02:14</div>
+                    <pre class="diary-content">「4 號迴路的冷卻電壓出現了 0.03% 的相位微差。
+醫療系統將此標記為我使用神經阻斷劑後的視覺疲勞，但熱電偶數據不會說謊。
+底層系統有幾段沒有寫入日誌的微小電流正在自動運行……就像某種看不見的隱性負載。」</pre>
+                </div>
+
+                <div class="diary-entry">
+                    <div class="diary-date">📅 6191-10-08 14:30</div>
+                    <pre class="diary-content">「無端電力耗損已擴大至 28%。0638遞交了一份報告，把設備短路歸咎於她自己的語法設定錯誤。
+我抽查了0638的程式碼——她的邏輯完全正確，崩潰是從作業系統最底層反湧上來的。
+我沒有糾正她的想法。
+重新分配全艦的資源與睡眠時間，是目前唯一能維持電力緩衝區的手段。
+讓他們認為我只是個嚴苛固執的規則怪傑，總比全艦陷入無法控制的恐慌要好。」</pre>
+                </div>
+
+                <div class="diary-entry">
+                    <div class="diary-date">📅 2026-10-11 23:50</div>
+                    <pre class="diary-content">「核心的遞迴算式開始出現不可逆的熱漂移。
+脈衝數據在 a₇ 節點出現了劇烈震盪，常規的軟體自動校正模組全部靜默失靈。
+外部通訊已被這股高頻電磁噪聲阻斷。
+系統沒有跳出任何警告，但數據顯示……這座導航塔正在從內部慢慢熄滅。」</pre>
+                </div>
+
+                <div class="diary-entry">
+                    <div class="diary-date">📅 2026-10-13 12:00（災難當天）</div>
+                    <pre class="diary-content">「數據收斂點鎖定在今晚。
+物理級別的防護阻斷器已經全部燒毀。當能量累積達到最大極限 M 時，唯有具備最高權限的『生物神經導體』接入，才能完成殘餘電荷的接地瀉壓。
+導航塔大門的反鎖機制已測試完畢。
+一張終端機，一個席位。航向會保持下去的。」</pre>
                 </div>
             </div>
         </div>
@@ -369,7 +482,7 @@
             'LC694650', 'RT742822', 'TS451120', 'HK621906', 'UC899609', 
             'MW735695', 'SH014740', 'OH435324', 'HR164810'
         ];
-        const PUZZLE_IDS = ['p_notice'];
+        const PUZZLE_IDS = ['p_notice', 'p_diary'];
         const MAX_CORRECT = 4;
         const STORAGE_KEY = 'desktop3_game_data';
         
@@ -502,8 +615,8 @@
                 closeModal('puzzle-modal');
 
                 // 3. 判斷答對項目，彈出對應 Modal
-                if (currentPId === 'p_gravity') {
-                    document.getElementById('gravity-viewer-modal').style.display = 'flex';
+                if (currentPId === 'p_diary') {
+                    document.getElementById('diary-viewer-modal').style.display = 'flex';
                 } else {
                     // 其他普通題目答對時顯示提示
                     alert("🎉 答案正確！");
